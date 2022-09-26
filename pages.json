@@ -1,0 +1,107 @@
+{
+	"pages": [
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/login/forgot-pwd",
+			"style": {
+				"navigationBarTitleText": "忘记密码"
+			}
+		},
+		{
+			"path": "pages/login/register",
+			"style": {
+				"navigationBarTitleText": "注册"
+			}
+		},
+		{
+			"path": "pages/home/index",
+			"style": {
+				"navigationBarTitleText": "首页"
+			}
+		},
+		{
+			"path": "pages/access/apply",
+			"style": {
+				"navigationBarTitleText": "申请人"
+			}
+		},
+		{
+			"path": "pages/access/approval",
+			"style": {
+				"navigationBarTitleText": "审批人-项目经理"
+			}
+		},
+		{
+			"path": "pages/access/detail",
+			"style": {
+				"navigationBarTitleText": "详情"
+			}
+		},
+		{
+			"path": "pages/access/clock",
+			"style": {
+				"navigationBarTitleText": "打卡详情"
+			}
+		},
+		{
+			"path": "pages/mine/index",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8",
+		"navigationStyle": "custom"
+	},
+	"tabBar": {
+		"color": "#869AAE",
+		"selectedColor": "#00D6D6",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [
+			{
+				"pagePath": "pages/login/login",
+				"iconPath": "",
+				"selectedIconPath": "",
+				"text": "登录",
+				"visible": false
+			},
+			{
+				"pagePath": "pages/home/index",
+				"iconPath": "static/img/home.png",
+				"selectedIconPath": "static/img/homeHL.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/access/apply",
+				"iconPath": "static/img/access.png",
+				"selectedIconPath": "static/img/accessHL.png",
+				"text": "进出机房",
+				"visible": false
+			},
+			{
+				"pagePath": "pages/access/approval",
+				"iconPath": "static/img/access.png",
+				"selectedIconPath": "static/img/accessHL.png",
+				"text": "进出机房",
+				"visible": false
+			},
+			{
+				"pagePath": "pages/mine/index",
+				"iconPath": "static/img/mine.png",
+				"selectedIconPath": "static/img/mineHL.png",
+				"text": "我的"
+			}
+		]
+	},
+	"uniIdRouter": {}
+}

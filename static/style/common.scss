@@ -1,0 +1,169 @@
+.fl {
+	float: right;
+}
+.fr {
+	float: right;
+}
+
+.content {
+	flex: 1;
+	// background-image: linear-gradient(to bottom, transparent, #f8fafc);
+	background-image: linear-gradient(to bottom, transparent, #f4f5f6);
+}
+
+.uni-forms {
+	.content-clear-icon {
+		font-size: 22px !important;
+	}
+
+	.uni-input-placeholder,
+	.uni-select__input-placeholder,
+	.uni-easyinput__placeholder-class {
+		font-size: 14px !important;
+		color: #999 !important;
+	}
+
+	image,
+	.is-input-border {
+		border-radius: 6px !important;
+	}
+}
+
+.tabs {
+	padding: 0 10px;
+	margin-top: 10px;
+	display: flex;
+	.tab-item {
+		flex: 1;
+		line-height: 2;
+		font-size: 18px;
+		font-weight: 700;
+		font-style: italic;
+		text-align: center;
+	}
+}
+.tab-item-active {
+	color: #0085ff;
+}
+
+.card-content__body {
+	& > view {
+		display: flex;
+		margin-bottom: 15px;
+		&:last-child {
+			margin-bottom: 0;
+		}
+		& > text {
+			font-size: 15px;
+			&:first-child {
+				min-width: 4em;
+				text-align: right;
+				margin-right: 15px;
+			}
+			&:last-child {
+				flex: 1;
+				width: 0; // 解决 flex 布局下，设置省略号不显示问题
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+			}
+		}
+	}
+	.applicant {
+		image {
+			width: 40px;
+			height: 40px;
+		}
+		> view {
+			display: flex;
+			flex-direction: column;
+			margin-left: 10px;
+			text {
+				line-height: 20px;
+				&:first-child {
+					min-width: auto;
+					font-size: 12px;
+					color: #666666;
+				}
+			}
+		}
+	}
+	.bold {
+		font-weight: 700;
+	}
+	.tar {
+		text-align: right;
+	}
+	.wrap {
+		white-space: inherit !important;
+	}
+}
+
+.card-status {
+	position: absolute;
+	right: 0;
+	top: 0;
+	padding: 0 10px;
+	height: 24px;
+	line-height: 24px;
+	font-size: 12px;
+	border-bottom-left-radius: 6px;
+	border-top-right-radius: 6px;
+	color: #434a4d;
+}
+
+.btn-row {
+	margin: 10px 25px;
+	display: flex;
+	button {
+		flex: 1;
+		line-height: 3;
+		font-size: 16px;
+		font-weight: bold;
+		border-radius: 6px;
+		&:not(:first-child) {
+			margin-left: 30px;
+		}
+	}
+	button[type='primary'] {
+		background-image: linear-gradient(to right, #12aaff, #14e3f0);
+	}
+	button[type='warn'] {
+		background-image: linear-gradient(to right, #ffa5a5, #ffcea1);
+		color: rgba(198, 20, 16, 1);
+	}
+	.button-hover[type='warn'] {
+		color: hsla(1, 85%, 42%, 0.6);
+	}
+	button[type='info'] {
+		background-image: linear-gradient(to right, #d5dce1, #a7b9ca);
+		color: #666666;
+	}
+	.button-hover[type='info'] {
+		color: hsla(0, 0%, 40%, 0.6);
+	}
+}
+
+.cancel-btn {
+	position: absolute;
+	bottom: 20px;
+	right: 10px;
+	padding: 0 12px;
+	line-height: 26px;
+	font-size: 14px;
+	color: #666666;
+	background: #fff;
+	&:after {
+		border: 1px solid #ffcb9a;
+	}
+}
+// .apply-btn {
+// 	position: absolute;
+// 	bottom: 20px;
+// 	right: 10px;
+// 	font-size: 14px;
+// 	line-height: 26px;
+// 	padding: 0 12px;
+// 	color: #fff;
+// 	background-image: linear-gradient(to right, #12aaff, #14e3f0);
+// }

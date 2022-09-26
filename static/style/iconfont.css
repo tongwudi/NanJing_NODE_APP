@@ -1,0 +1,18 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 898326 */
+  src: url('/static/font/iconfont.ttf') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+}
+
+.icon-tuichudenglu:before {
+  content: "\e632";
+}
+
+.icon-password:before {
+  content: "\e682";
+}
+
