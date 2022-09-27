@@ -13,10 +13,10 @@
 			:model="formData"
 			:rules="rules"
 		>
-			<uni-forms-item label="手机号" name="phoneNumber">
+			<uni-forms-item label="手机号" name="phonenumber">
 				<uni-easyinput
 					type="number"
-					v-model="formData.phoneNumber"
+					v-model="formData.phonenumber"
 					placeholder="请输入手机号"
 				/>
 			</uni-forms-item>
@@ -30,8 +30,8 @@
 			<uni-forms-item label="验证码" name="code">
 				<view class="code-row">
 					<uni-easyinput v-model="formData.code" />
-					<!-- <image :src="codeUrl" @tap="getCodeUrl"></image> -->
-					<image src="/static/logo.png"></image>
+					<image :src="codeUrl" @tap="getCodeUrl"></image>
+					<!-- <image src="/static/logo.png"></image> -->
 				</view>
 			</uni-forms-item>
 			<view class="settings-row">
@@ -59,19 +59,21 @@
 </template>
 
 <script>
-import { phoneNumber, password, code } from '@/config/verification.js'
+import { phonenumber, password, code } from '@/config/verification.js'
+import { captchaImage, appLogin } from '@/api/index.js'
+// import { encrypt, decrypt } from '@/config/jsencrypt.js'
+import { mapMutations, mapActions } from 'vuex'
 export default {
 	data() {
 		return {
-			// loginLoading: false,
 			formData: {
-				phoneNumber: '15065014525',
-				password: 'qqqq1111',
+				phonenumber: '15888888888',
+				password: 'Jy@admin123',
 				code: '',
 				uuid: ''
 			},
 			rules: {
-				phoneNumber,
+				phonenumber,
 				password,
 				code
 			},
@@ -80,14 +82,13 @@ export default {
 		}
 	},
 	onLoad() {
-		uni.hideTabBar()
-	},
-	onShow() {
-		// this.getCodeUrl()
+		this.getCodeUrl()
 	},
 	methods: {
+		...mapMutations(['SET_TOKEN']),
+		...mapActions(['GetInfo']),
 		async getCodeUrl() {
-			const { img, uuid } = await this.$request.get('/captchaImage')
+			const { img, uuid } = await captchaImage()
 			this.codeUrl = 'data:image/gif;base64,' + img
 			this.formData.uuid = uuid
 		},
@@ -97,39 +98,36 @@ export default {
 		submitLogin(ref) {
 			this.$refs[ref]
 				.validate()
-				.then(data => {
+				.then(async data => {
 					uni.showLoading({
 						title: '加载中',
 						mask: true
 					})
-					setTimeout(() => {
-						uni.setStorageSync('token', 'tongwudi')
-						uni.setStorageSync('isRememberPwd', this.isRememberPwd)
-						uni.setStorage({
-							key: 'role',
-							data: data.code == 111,
-							success: () => {
-								uni.setTabBarItem({
-									index: data.code == 111 ? 2 : 3,
-									visible: true,
-									success: () => {
-										uni.hideLoading()
-										uni.showTabBar()
-										uni.switchTab({ url: '/pages/home/index' })
-									}
-								})
-							}
-						})
-					}, 2000)
-					// const res = await this.$request.post('/appLogin', { data })
-					// if (res.code === 200) {
 
-					// } else {
-					// 	uni.showToast({
-					// 		title: res.msg,
-					// 		icon: 'error'
-					// 	})
-					// }
+					uni.hideLoading()
+					uni.switchTab({ url: '/pages/home/index' })
+					return
+
+					const params = {
+						...this.formData
+						// password: encrypt(this.formData.password)
+					}
+					const res = await appLogin(params)
+					uni.hideLoading()
+
+					if (res.code === 200) {
+						this.SET_TOKEN(res.token)
+						this.GetInfo()
+
+						uni.switchTab({ url: '/pages/home/index' })
+					} else {
+						this.getCodeUrl()
+
+						uni.showToast({
+							title: res.msg,
+							icon: 'error'
+						})
+					}
 				})
 				.catch(err => {
 					console.log('err', err)

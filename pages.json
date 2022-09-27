@@ -69,13 +69,6 @@
 		"backgroundColor": "#ffffff",
 		"list": [
 			{
-				"pagePath": "pages/login/login",
-				"iconPath": "",
-				"selectedIconPath": "",
-				"text": "登录",
-				"visible": false
-			},
-			{
 				"pagePath": "pages/home/index",
 				"iconPath": "static/img/home.png",
 				"selectedIconPath": "static/img/homeHL.png",

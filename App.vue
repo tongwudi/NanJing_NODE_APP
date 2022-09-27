@@ -2,11 +2,11 @@
 export default {
 	onLaunch: function() {
 		console.log('App Launch')
-	},
-	watch:{
-		'$store'(val){
-			console.log(val);
-		}
+
+		let token = uni.getStorageSync('token')
+		uni.redirectTo({
+			url: token ? 'pages/home/index' : 'pages/login/login'
+		})
 	},
 	onShow: function() {
 		console.log('App Show')

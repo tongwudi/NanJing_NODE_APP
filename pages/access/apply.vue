@@ -22,73 +22,105 @@
 		<view class="content" v-if="tabIndex === 0">
 			<uni-forms
 				ref="applyForm"
+				validate-trigger="bind"
 				:labelWidth="75"
 				:model="formData"
 				:rules="rules"
 			>
 				<m-card>
 					<view class="card-content__body">
-						<uni-forms-item label="行政区域">
-							<uni-data-select
-								v-model="formData.aa"
+						<uni-forms-item label="行政区域" name="aaa">
+							<uni-data-picker
+								popup-title="请选择行政区域"
+								v-model="formData.aaa"
 								:localdata="range"
-							></uni-data-select>
+							></uni-data-picker>
 						</uni-forms-item>
-						<uni-forms-item label="机房名称">
-							<uni-easyinput v-model="formData.bb" placeholder="请输入" />
+						<uni-forms-item label="机房名称" name="roomId">
+							<uni-data-picker
+								ref="roomPicker"
+								popup-title="请选择机房名称"
+								v-model="formData.roomId"
+								manual
+								:localdata="roomList"
+								@change="changeRoom"
+							>
+								<template #default>
+									<uni-easyinput
+										v-model="formData.roomName"
+										@change="searchRoomList"
+										@clear="clearRoom"
+										placeholder="请输入"
+									/>
+								</template>
+							</uni-data-picker>
 						</uni-forms-item>
-						<uni-forms-item label="申请单位">
-							<uni-easyinput v-model="formData.bb" placeholder="请输入" />
+						<uni-forms-item label="申请单位" name="applyCompany">
+							<uni-easyinput
+								v-model="formData.applyCompany"
+								placeholder="请输入"
+							/>
 						</uni-forms-item>
-						<uni-forms-item label="项目经理">
-							<uni-data-select
-								v-model="formData.aa"
+						<uni-forms-item label="项目经理" name="proManagerId">
+							<uni-data-picker
+								v-model="formData.proManagerId"
 								:localdata="range"
-							></uni-data-select>
+							></uni-data-picker>
 						</uni-forms-item>
-						<uni-forms-item label="申请时间">
+						<uni-forms-item label="申请时间" name="applyTime">
 							<uni-datetime-picker
 								type="date"
-								v-model="formData.cc"
+								v-model="formData.applyTime"
 								return-type="date"
 							/>
 						</uni-forms-item>
-						<uni-forms-item label="实施时间">
+						<uni-forms-item label="实施时间" name="workTime">
 							<uni-datetime-picker
 								type="datetimerange"
-								v-model="formData.dd"
+								v-model="formData.workTime"
 								hide-second
 								rangeSeparator="至"
 							/>
 						</uni-forms-item>
-						<uni-forms-item label="所属项目">
-							<uni-easyinput v-model="formData.bb" placeholder="请输入" />
-						</uni-forms-item>
-						<uni-forms-item label="所属专业">
-							<uni-easyinput v-model="formData.bb" placeholder="请输入" />
-						</uni-forms-item>
-						<uni-forms-item label="施工单位">
-							<uni-easyinput v-model="formData.bb" placeholder="请输入" />
-						</uni-forms-item>
-						<uni-forms-item label="进出类型">
-							<uni-data-select
-								v-model="formData.qq"
-								:localdata="range"
-							></uni-data-select>
-						</uni-forms-item>
-						<uni-forms-item label="施工内容">
+						<uni-forms-item label="所属项目" name="belongProject">
 							<uni-easyinput
-								type="textarea"
-								v-model="formData.bb"
+								v-model="formData.belongProject"
 								placeholder="请输入"
 							/>
 						</uni-forms-item>
-						<uni-forms-item label="附件" class="upload">
+						<uni-forms-item label="所属专业" name="belongMajor">
+							<uni-easyinput
+								v-model="formData.belongMajor"
+								placeholder="请输入"
+							/>
+						</uni-forms-item>
+						<uni-forms-item label="施工单位" name="workCompany">
+							<uni-easyinput
+								v-model="formData.workCompany"
+								placeholder="请输入"
+							/>
+						</uni-forms-item>
+						<uni-forms-item label="进出类型" name="applyTypeId">
+							<uni-data-picker
+								v-model="formData.applyTypeId"
+								:localdata="applyTypeList"
+							></uni-data-picker>
+						</uni-forms-item>
+						<uni-forms-item label="施工内容" name="workNote">
+							<uni-easyinput
+								type="textarea"
+								v-model="formData.workNote"
+								:maxlength="300"
+								placeholder="请输入"
+							/>
+						</uni-forms-item>
+						<uni-forms-item class="upload" label="附件" name="files">
 							<uni-file-picker
 								limit="5"
 								file-mediatype="all"
+								v-model="formData.files"
 								:list-styles="listStyles"
-								:value="formData.ee"
+								:auto-upload="false"
 							>
 								<button>+ 上传文件</button>
 							</uni-file-picker>
@@ -176,6 +208,8 @@
 </template>
 
 <script>
+import { verify } from '@/config/verification.js'
+import { startApply } from '@/api/index.js'
 export default {
 	data() {
 		return {
@@ -183,24 +217,49 @@ export default {
 			tabIndex: 0,
 			formData: {},
 			rules: {
-				qq: [
-					{
-						required: true,
-						errorMessage: '进出类型未选择'
-					}
-				]
+				aaa: verify('行政区域', 'select'),
+				roomId: verify('机房名称', 'select'),
+				applyCompany: verify('项目经理', 'input'),
+				proManagerId: verify('申请单位', 'select'),
+				applyTime: verify('申请时间', 'input'),
+				workTime: verify('实施时间', 'input'),
+				belongProject: verify('所属项目', 'input'),
+				belongMajor: verify('所属专业', 'input'),
+				workCompany: verify('施工单位', 'input'),
+				applyTypeId: verify('进出类型', 'select'),
+				workNote: verify('施工内容', 'input'),
+				files: {
+					rules: [
+						{
+							required: true,
+							format: 'array',
+							errorMessage: '附件不能为空'
+						}
+					]
+				}
 			},
 			range: [
-				{ value: 0, text: '篮球' },
-				{ value: 1, text: '足球' },
-				{ value: 2, text: '游泳' }
+				{ value: 1, text: '篮球' },
+				{ value: 2, text: '足球' },
+				{ value: 3, text: '游泳' }
+			],
+			roomList: [],
+			applyTypeList: [
+				{ text: '巡检', value: 1 },
+				{ text: '勘察', value: 2 },
+				{ text: '维修', value: 3 },
+				{ text: '跳纤', value: 4 },
+				{ text: '设备安装', value: 5 },
+				{ text: '空调移机', value: 6 },
+				{ text: '设备移机', value: 7 },
+				{ text: '设备退网', value: 8 },
+				{ text: '其他', value: 9 }
 			]
 		}
 	},
 	computed: {
 		listStyles() {
 			return {
-				// dividline: true,
 				border: false
 			}
 		}
@@ -221,11 +280,33 @@ export default {
 		}
 	},
 	methods: {
+		searchRoomList(val) {
+			if (!val) return
+
+			this.roomList = this.applyTypeList.slice(4)
+			this.$delete(this.formData, 'roomName')
+			this.$refs.roomPicker.show()
+		},
+		clearRoom() {
+			this.$delete(this.formData, 'roomId')
+			this.$delete(this.formData, 'roomName')
+		},
+		changeRoom(e) {
+			const obj = e.detail.value[0]
+
+			this.formData.roomId = obj.value
+			this.formData.roomName = obj.text
+		},
+		selectFile(e) {
+			console.log(e)
+		},
 		submitForm(ref) {
 			this.$refs[ref]
 				.validate()
 				.then(data => {
 					console.log(data)
+					// const res = await startApply(data)
+					// console.log(res)
 					// uni.showLoading({
 					// 	title: '加载中',
 					// 	mask: true
@@ -233,6 +314,11 @@ export default {
 				})
 				.catch(err => {
 					console.log('err', err)
+
+					uni.showToast({
+						icon: 'error',
+						title: '请检查输入'
+					})
 				})
 		},
 		renderStatusBgColor(index) {
@@ -272,9 +358,6 @@ export default {
 </script>
 
 <style lang="scss">
-.uni-forms-item {
-	margin-bottom: 15px;
-}
 /deep/ {
 	.uni-forms-item__label {
 		color: #333;

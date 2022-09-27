@@ -83,6 +83,7 @@
 </template>
 
 <script>
+import { searchTodo } from '@/api/index.js'
 export default {
 	data() {
 		return {
@@ -99,6 +100,9 @@ export default {
 			}
 		}
 	},
+	onLoad() {
+		this.getList()
+	},
 	methods: {
 		renderStatusBgColor(index) {
 			if (index % 2 === 0) {
@@ -109,6 +113,10 @@ export default {
 		},
 		changeTab(index) {
 			this.tabIndex = index
+		},
+		async getList() {
+			const res = await searchTodo()
+			console.log(res)
 		},
 		viewDetail() {
 			uni.navigateTo({ url: './detail' })

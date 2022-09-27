@@ -13,10 +13,10 @@
 				<uni-forms-item label="姓名" name="name">
 					<uni-easyinput v-model="formData.name" placeholder="请输入姓名" />
 				</uni-forms-item>
-				<uni-forms-item label="手机号" name="phoneNumber">
+				<uni-forms-item label="手机号" name="phonenumber">
 					<uni-easyinput
 						type="number"
-						v-model="formData.phoneNumber"
+						v-model="formData.phonenumber"
 						placeholder="请输入手机号"
 					/>
 				</uni-forms-item>
@@ -54,8 +54,8 @@
 
 <script>
 import {
-	name,
-	phoneNumber,
+	verify,
+	phonenumber,
 	idcard,
 	email,
 	password,
@@ -66,7 +66,7 @@ export default {
 		return {
 			formData: {
 				name: '',
-				phoneNumber: '',
+				phonenumber: '',
 				idcard: '',
 				email: '',
 				password: '',
@@ -74,14 +74,13 @@ export default {
 				uuid: ''
 			},
 			rules: {
-				name,
-				phoneNumber,
+				name: verify('姓名', 'input'),
+				phonenumber,
 				idcard,
 				email,
 				password,
 				confirmPass
 			},
-			// loginLoading: false,
 			codeUrl: ''
 		}
 	},

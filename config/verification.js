@@ -1,18 +1,29 @@
-const verify = label => {
-	return {
-		required: true,
-		errorMessage: label + '不能为空'
+const verify = (label, type) => {
+	if (type === 'select') {
+		return {
+			rules: [{
+				required: true,
+				errorMessage: label + '未选择'
+			}]
+		}
+	} else if (type === 'input') {
+		return {
+			rules: [{
+				required: true,
+				errorMessage: label + '不能为空'
+			}]
+		}
+	} else {
+		return {
+			required: true,
+			errorMessage: label + '不能为空'
+		}
 	}
 }
 
 module.exports = {
-	name: {
-		rules: [verify('姓名')]
-	},
-	code: {
-		rules: [verify('验证码')]
-	},
-	phoneNumber: {
+	verify,
+	phonenumber: {
 		rules: [
 			verify('手机号'),
 			{

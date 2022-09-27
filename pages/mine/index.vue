@@ -59,6 +59,7 @@ export default {
 	},
 	methods: {
 		logout() {
+			uni.clearStorageSync()
 			console.log(112)
 		}
 	}

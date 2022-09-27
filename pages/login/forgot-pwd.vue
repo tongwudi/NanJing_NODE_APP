@@ -23,11 +23,11 @@
 					/>
 				</uni-forms-item>
 				<uni-forms-item label="验证码" name="code">
-					<view class="code-row">
+					<uni-easyinput v-model="formData.code" placeholder="请输入验证码" />
+					<!-- <view class="code-row">
 						<uni-easyinput v-model="formData.code" />
 						<image src="/static/logo.png"></image>
-						<!-- <image :src="codeUrl" @tap="getCodeUrl"></image> -->
-					</view>
+					</view> -->
 				</uni-forms-item>
 				<uni-forms-item label="新密码" name="password">
 					<uni-easyinput
@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { email, code, password, confirmPass } from '@/config/verification.js'
+import { email, verify, password, confirmPass } from '@/config/verification.js'
 export default {
 	data() {
 		return {
@@ -66,11 +66,10 @@ export default {
 			},
 			rules: {
 				email,
-				code,
+				code: verify('验证码', 'input'),
 				password,
 				confirmPass
 			},
-			// loginLoading: false,
 			codeUrl: ''
 		}
 	},
