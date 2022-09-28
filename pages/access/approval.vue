@@ -20,25 +20,46 @@
 		</view>
 
 		<view class="content" v-if="tabIndex === 0">
-			<m-card v-for="index in 8" :key="index" @tapClick="viewDetail">
-				<view class="card-content__body">
-					<view class="applicant">
-						<image src="../../static/logo.png"></image>
-						<view>
-							<text>申请人</text>
-							<text>张三</text>
-						</view>
-					</view>
-					<view>
-						<text>进出类型</text>
-						<text>巡检勘察</text>
-					</view>
-					<view>
-						<text>申请时间</text>
-						<text>2022/09/16 15:20</text>
-					</view>
-				</view>
-			</m-card>
+			<view class="select-row">
+				<uni-data-picker
+					placeholder="请选择进出类型"
+					:clear-icon="false"
+					:readonly="isOpened"
+					:localdata="applyTypeList"
+				></uni-data-picker>
+				<button :type="isOpened ? 'primary' : 'default'" @tap="batchClick">
+					{{ isOpened ? '批量通过' : '批量操作' }}
+				</button>
+			</view>
+
+			<checkbox-group @change="checkboxChange">
+				<uni-row class="swipe-box" v-for="index in 8" :key="index">
+					<uni-col :span="isOpened ? 21 : 24">
+						<m-card @tapClick="viewDetail">
+							<view class="card-content__body">
+								<view class="applicant">
+									<image src="../../static/logo.png"></image>
+									<view>
+										<text>申请人</text>
+										<text>张三</text>
+									</view>
+								</view>
+								<view>
+									<text>进出类型</text>
+									<text>巡检勘察</text>
+								</view>
+								<view>
+									<text>申请时间</text>
+									<text>2022/09/16 15:20</text>
+								</view>
+							</view>
+						</m-card>
+					</uni-col>
+					<uni-col class="swipe-box_right" :span="isOpened ? 3 : 0">
+						<checkbox :value="index + ''" />
+					</uni-col>
+				</uni-row>
+			</checkbox-group>
 		</view>
 
 		<view class="content" v-else-if="tabIndex === 1">
@@ -88,7 +109,20 @@ export default {
 	data() {
 		return {
 			tabs: [{ name: '待审批' }, { name: '审批记录' }],
-			tabIndex: 0
+			tabIndex: 0,
+			applyTypeList: [
+				{ text: '巡检', value: 1 },
+				{ text: '勘察', value: 2 },
+				{ text: '维修', value: 3 },
+				{ text: '跳纤', value: 4 },
+				{ text: '设备安装', value: 5 },
+				{ text: '空调移机', value: 6 },
+				{ text: '设备移机', value: 7 },
+				{ text: '设备退网', value: 8 },
+				{ text: '其他', value: 9 }
+			],
+			isOpened: false,
+			batchIds: []
 		}
 	},
 	filters: {
@@ -114,6 +148,16 @@ export default {
 		changeTab(index) {
 			this.tabIndex = index
 		},
+		batchClick() {
+			if (this.isOpened && this.batchIds.length) {
+				// 发起请求
+			}
+			this.isOpened = !this.isOpened
+		},
+		checkboxChange(e) {
+			const values = e.detail.value
+			this.batchIds = values
+		},
 		async getList() {
 			const res = await searchTodo()
 			console.log(res)
@@ -137,5 +181,42 @@ export default {
 }
 .status-reject {
 	background-image: linear-gradient(to right, #ffcea1, #ffa5a5);
+}
+.select-row {
+	display: flex;
+	margin: 0 10px 10px;
+	/deep/ {
+		.input-value-border {
+			border: 1px solid #b1daff;
+			background: #fff;
+		}
+		.input-value {
+			height: 40px;
+		}
+	}
+	button {
+		margin-left: 15px;
+		line-height: 40px;
+		font-size: 12px;
+		border-radius: 6px;
+	}
+	button[type='primary'] {
+		background-image: linear-gradient(to right, #12aaff, #14e3f0);
+	}
+	button[type='default'] {
+		background-color: #fff;
+		color: #585858;
+		&::after {
+			border: 2px solid #b1daff;
+			border-radius: 12px;
+		}
+	}
+}
+.swipe-box {
+	display: flex;
+	align-items: center;
+	&_right {
+		text-align: center;
+	}
 }
 </style>

@@ -37,11 +37,7 @@
 			<view class="settings-row">
 				<checkbox-group @change="changeRemember">
 					<label>
-						<checkbox
-							value="1"
-							:checked="isRememberPwd"
-							style="transform:scale(0.75)"
-						/>
+						<checkbox value="1" style="transform:scale(0.75)" />
 						<text>记住密码</text>
 					</label>
 				</checkbox-group>
@@ -61,14 +57,14 @@
 <script>
 import { phonenumber, password, code } from '@/config/verification.js'
 import { captchaImage, appLogin } from '@/api/index.js'
-// import { encrypt, decrypt } from '@/config/jsencrypt.js'
+import { encrypt, decrypt } from '@/config/jsencrypt.js'
 import { mapMutations, mapActions } from 'vuex'
 export default {
 	data() {
 		return {
 			formData: {
 				phonenumber: '15888888888',
-				password: 'Jy@admin123',
+				password: 'admin123',
 				code: '',
 				uuid: ''
 			},
@@ -104,13 +100,13 @@ export default {
 						mask: true
 					})
 
-					uni.hideLoading()
-					uni.switchTab({ url: '/pages/home/index' })
-					return
+					// uni.hideLoading()
+					// uni.switchTab({ url: '/pages/home/index' })
+					// return
 
 					const params = {
-						...this.formData
-						// password: encrypt(this.formData.password)
+						...this.formData,
+						password: encrypt(this.formData.password)
 					}
 					const res = await appLogin(params)
 					uni.hideLoading()

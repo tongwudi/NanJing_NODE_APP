@@ -29,31 +29,22 @@
 			>
 				<m-card>
 					<view class="card-content__body">
-						<uni-forms-item label="行政区域" name="aaa">
+						<uni-forms-item label="行政区域" name="county">
 							<uni-data-picker
 								popup-title="请选择行政区域"
-								v-model="formData.aaa"
-								:localdata="range"
+								v-model="formData.county"
+								:clear-icon="false"
+								:localdata="countyList"
+								@change="getRoomList"
 							></uni-data-picker>
 						</uni-forms-item>
 						<uni-forms-item label="机房名称" name="roomId">
 							<uni-data-picker
-								ref="roomPicker"
 								popup-title="请选择机房名称"
 								v-model="formData.roomId"
-								manual
+								:clear-icon="false"
 								:localdata="roomList"
-								@change="changeRoom"
-							>
-								<template #default>
-									<uni-easyinput
-										v-model="formData.roomName"
-										@change="searchRoomList"
-										@clear="clearRoom"
-										placeholder="请输入"
-									/>
-								</template>
-							</uni-data-picker>
+							></uni-data-picker>
 						</uni-forms-item>
 						<uni-forms-item label="申请单位" name="applyCompany">
 							<uni-easyinput
@@ -63,23 +54,21 @@
 						</uni-forms-item>
 						<uni-forms-item label="项目经理" name="proManagerId">
 							<uni-data-picker
+								popup-title="请选择项目经理"
 								v-model="formData.proManagerId"
-								:localdata="range"
+								:clear-icon="false"
+								:localdata="leaderList"
 							></uni-data-picker>
 						</uni-forms-item>
 						<uni-forms-item label="申请时间" name="applyTime">
-							<uni-datetime-picker
-								type="date"
-								v-model="formData.applyTime"
-								return-type="date"
-							/>
+							<uni-datetime-picker type="date" v-model="formData.applyTime" />
 						</uni-forms-item>
 						<uni-forms-item label="实施时间" name="workTime">
 							<uni-datetime-picker
 								type="datetimerange"
 								v-model="formData.workTime"
+								range-separator="至"
 								hide-second
-								rangeSeparator="至"
 							/>
 						</uni-forms-item>
 						<uni-forms-item label="所属项目" name="belongProject">
@@ -102,11 +91,13 @@
 						</uni-forms-item>
 						<uni-forms-item label="进出类型" name="applyTypeId">
 							<uni-data-picker
+								popup-title="请选择进出类型"
 								v-model="formData.applyTypeId"
+								:clear-icon="false"
 								:localdata="applyTypeList"
 							></uni-data-picker>
 						</uni-forms-item>
-						<uni-forms-item label="施工内容" name="workNote">
+						<uni-forms-item label="施工内容">
 							<uni-easyinput
 								type="textarea"
 								v-model="formData.workNote"
@@ -114,38 +105,49 @@
 								placeholder="请输入"
 							/>
 						</uni-forms-item>
-						<uni-forms-item class="upload" label="附件" name="files">
+						<!-- <uni-forms-item class="upload" label="附件">
 							<uni-file-picker
 								limit="5"
 								file-mediatype="all"
-								v-model="formData.files"
+								v-model="files"
 								:list-styles="listStyles"
 								:auto-upload="false"
 							>
 								<button>+ 上传文件</button>
 							</uni-file-picker>
-						</uni-forms-item>
+						</uni-forms-item> -->
 					</view>
 				</m-card>
 
 				<view class="staff-list">
 					<m-card
 						class="staff"
-						v-for="index in 3"
+						v-for="(item, index) in staffList"
 						:key="index"
-						:title="'进出人员' + index"
+						:title="'进出人员' + (index + 1)"
 					>
+						<template #icon>
+							<uni-icons
+								class="fr"
+								size="20"
+								:type="index === staffList.length - 1 ? 'plus' : 'minus'"
+								@tap="changeStaff(index)"
+							></uni-icons>
+						</template>
 						<view class="card-content__body">
 							<uni-forms-item label="姓名">
-								<uni-easyinput v-model="formData.bb" placeholder="请输入" />
+								<uni-easyinput v-model="item.applyName" placeholder="请输入" />
 							</uni-forms-item>
 							<uni-forms-item label="联系电话">
-								<uni-easyinput v-model="formData.bb" placeholder="请输入" />
+								<uni-easyinput
+									v-model="item.applyContract"
+									placeholder="请输入"
+								/>
 							</uni-forms-item>
 							<uni-forms-item label="身份号码">
 								<uni-easyinput
 									type="idcard"
-									v-model="formData.bb"
+									v-model="item.applyIdCard"
 									placeholder="请输入"
 								/>
 							</uni-forms-item>
@@ -209,7 +211,13 @@
 
 <script>
 import { verify } from '@/config/verification.js'
-import { startApply } from '@/api/index.js'
+import {
+	startApply,
+	getCounty,
+	getRoomByCounty,
+	getLeader,
+	getApplyType
+} from '@/api/index.js'
 export default {
 	data() {
 		return {
@@ -217,7 +225,7 @@ export default {
 			tabIndex: 0,
 			formData: {},
 			rules: {
-				aaa: verify('行政区域', 'select'),
+				county: verify('行政区域', 'select'),
 				roomId: verify('机房名称', 'select'),
 				applyCompany: verify('项目经理', 'input'),
 				proManagerId: verify('申请单位', 'select'),
@@ -226,35 +234,23 @@ export default {
 				belongProject: verify('所属项目', 'input'),
 				belongMajor: verify('所属专业', 'input'),
 				workCompany: verify('施工单位', 'input'),
-				applyTypeId: verify('进出类型', 'select'),
-				workNote: verify('施工内容', 'input'),
-				files: {
-					rules: [
-						{
-							required: true,
-							format: 'array',
-							errorMessage: '附件不能为空'
-						}
-					]
-				}
+				applyTypeId: verify('进出类型', 'select')
+				// workNote: verify('施工内容', 'input'),
+				// files: {
+				// 	rules: [
+				// 		{
+				// 			required: true,
+				// 			format: 'array',
+				// 			errorMessage: '附件不能为空'
+				// 		}
+				// 	]
+				// }
 			},
-			range: [
-				{ value: 1, text: '篮球' },
-				{ value: 2, text: '足球' },
-				{ value: 3, text: '游泳' }
-			],
+			countyList: [],
 			roomList: [],
-			applyTypeList: [
-				{ text: '巡检', value: 1 },
-				{ text: '勘察', value: 2 },
-				{ text: '维修', value: 3 },
-				{ text: '跳纤', value: 4 },
-				{ text: '设备安装', value: 5 },
-				{ text: '空调移机', value: 6 },
-				{ text: '设备移机', value: 7 },
-				{ text: '设备退网', value: 8 },
-				{ text: '其他', value: 9 }
-			]
+			leaderList: [],
+			applyTypeList: [],
+			staffList: [{}]
 		}
 	},
 	computed: {
@@ -279,38 +275,87 @@ export default {
 			}
 		}
 	},
+	onLoad() {
+		Promise.all([
+			this.getCountyList(),
+			this.getLeaderList(),
+			this.getApplyTypeList()
+		])
+	},
 	methods: {
-		searchRoomList(val) {
-			if (!val) return
-
-			this.roomList = this.applyTypeList.slice(4)
-			this.$delete(this.formData, 'roomName')
-			this.$refs.roomPicker.show()
+		async getCountyList() {
+			const { code, data } = await getCounty()
+			if (code === 200) {
+				this.countyList = data.map(item => {
+					return {
+						text: item,
+						value: item
+					}
+				})
+				this.roomList = []
+				this.$delete(this.formData, 'roomId')
+			}
 		},
-		clearRoom() {
-			this.$delete(this.formData, 'roomId')
-			this.$delete(this.formData, 'roomName')
+		async getRoomList(e) {
+			const { value: county } = e.detail.value[0]
+			const res = await getRoomByCounty(county)
+			this.roomList = res.data.map(item => {
+				return {
+					text: item.roomName,
+					value: item.roomId
+				}
+			})
 		},
-		changeRoom(e) {
-			const obj = e.detail.value[0]
-
-			this.formData.roomId = obj.value
-			this.formData.roomName = obj.text
+		async getLeaderList() {
+			const { code, data } = await getLeader()
+			if (code === 200) {
+				this.leaderList = data.map(item => {
+					return {
+						text: item.nickName,
+						value: item.userId
+					}
+				})
+			}
+		},
+		async getApplyTypeList() {
+			const { code, data } = await getApplyType()
+			if (code === 200) {
+				this.applyTypeList = data.map(item => {
+					return {
+						text: item.applyTypeName,
+						value: item.applyTypeId
+					}
+				})
+			}
 		},
 		selectFile(e) {
 			console.log(e)
 		},
+		changeStaff(idx) {
+			if (idx === this.staffList.length - 1) {
+				this.staffList.push({})
+			} else {
+				this.staffList.splice(idx, 1)
+			}
+		},
 		submitForm(ref) {
 			this.$refs[ref]
 				.validate()
-				.then(data => {
-					console.log(data)
-					// const res = await startApply(data)
-					// console.log(res)
-					// uni.showLoading({
-					// 	title: '加载中',
-					// 	mask: true
-					// })
+				.then(async data => {
+					uni.showLoading({
+						title: '加载中',
+						mask: true
+					})
+					const params = {
+						enterRoomApplyDto: {
+							jyApplyEnterRoom: data,
+							jyApplyPeople: this.staffList
+						},
+						files: this.files
+					}
+					const res = await startApply(params)
+					console.log(res)
+					uni.hideLoading()
 				})
 				.catch(err => {
 					console.log('err', err)

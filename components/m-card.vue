@@ -9,7 +9,6 @@
 		<view class="card-title" v-if="title">
 			<text>{{ title }}</text>
 			<slot name="icon"></slot>
-			<uni-icons class="fr" :type="rightIcon" size="15" v-if="rightIcon"></uni-icons>
 		</view>
 		<view
 			class="card-content"
@@ -30,10 +29,6 @@ export default {
 			type: String,
 			default: ''
 		},
-		rightIcon: {
-			type: String,
-			default: 'plusempty'
-		},
 		padding: {
 			type: [Number, String],
 			default: 20
@@ -53,6 +48,10 @@ export default {
 	border: 1px solid #edf0f3;
 	background-color: #fff;
 	position: relative;
+	
+	&:first-child {
+		margin-top: 0;
+	}
 
 	&-title {
 		padding: 0 15px;

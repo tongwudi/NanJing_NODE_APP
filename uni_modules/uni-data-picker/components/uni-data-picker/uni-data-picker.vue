@@ -119,10 +119,6 @@
 			ellipsis: {
 				type: Boolean,
 				default: true
-			},
-			manual: { // 是否手动控制弹出 dialog
-				type: Boolean,
-				default: false
 			}
 		},
 		data() {
@@ -203,7 +199,6 @@
 				if (this.readonly) {
 					return
 				}
-				if (this.manual) return
 				this.show()
 			},
 			handleClose(e) {
