@@ -302,14 +302,11 @@ export default {
 		}
 	},
 	onLoad() {
-		uni.showLoading({ title: '加载中', mask: true })
 		Promise.all([
 			this.getCountyList(),
 			this.getLeaderList(),
 			this.getApplyTypeList()
-		]).then(() => {
-			uni.hideLoading()
-		})
+		])
 	},
 	methods: {
 		renderStatusBgColor(index) {
@@ -334,11 +331,12 @@ export default {
 						value: item
 					}
 				})
-				this.roomList = []
-				this.$delete(this.formData, 'roomId')
 			}
 		},
 		async getRoomList(e) {
+			this.roomList = []
+			this.$delete(this.formData, 'roomId')
+
 			const { value: county } = e.detail.value[0]
 			const res = await getRoomByCounty(county)
 			this.roomList = res.data.map(item => {
@@ -384,10 +382,6 @@ export default {
 			this.$refs[ref]
 				.validate()
 				.then(async data => {
-					uni.showLoading({
-						title: '加载中',
-						mask: true
-					})
 					const params = {
 						enterRoomApplyDto: {
 							jyApplyEnterRoom: data,
@@ -397,7 +391,6 @@ export default {
 					}
 					const res = await startApply(params)
 					console.log(res)
-					uni.hideLoading()
 				})
 				.catch(err => {
 					console.log('err', err)
@@ -410,7 +403,6 @@ export default {
 		},
 		changeTab(index) {
 			if (this.tabIndex === index) return
-			console.log(1)
 			this.tabIndex = index
 		},
 		viewDetail(index) {
@@ -438,6 +430,14 @@ export default {
 	.uni-forms-item__label {
 		color: #333;
 	}
+	.uni-forms-item__content {
+		width: 0;
+	}
+	.selected-item {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 	.files__name {
 		color: #2391ff;
 	}
@@ -447,7 +447,7 @@ export default {
 // }
 
 .upload button {
-	font-size: 14px;
+	font-size: 28rpx;
 	color: #2391ff;
 	background-color: #fff;
 }

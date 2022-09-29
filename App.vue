@@ -25,7 +25,6 @@ export default {
 page {
 	min-height: 100%;
 	height: auto;
-	display: flex;
 	font-size: 14px;
 	color: #333;
 }
@@ -36,7 +35,6 @@ page {
 }
 
 .container {
-	flex: 1;
 	display: flex;
 	flex-direction: column;
 }

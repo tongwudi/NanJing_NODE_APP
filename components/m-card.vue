@@ -31,7 +31,7 @@ export default {
 		renderPadding() {
 			return typeof this.padding === 'string'
 				? this.padding
-				: this.padding + 'px'
+				: this.padding * 2 + 'rpx'
 		}
 	}
 }
@@ -39,18 +39,18 @@ export default {
 
 <style lang="scss">
 .card {
-	margin: 10px;
-	border-radius: 6px;
-	border: 1px solid #edf0f3;
+	margin: 20rpx;
+	border-radius: 12rpx;
+	border: 1rpx solid #edf0f3;
 	background-color: #fff;
-	box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.08);
+	box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.08);
 	position: relative;
 
 	&-title {
-		padding: 0 15px;
+		padding: 0 30rpx;
 		line-height: 38px;
-		border-top-left-radius: 6px;
-		border-top-right-radius: 6px;
+		border-top-left-radius: 12rpx;
+		border-top-right-radius: 12rpx;
 		color: #000;
 		background-image: linear-gradient(to right, #e3f2ff, #fff);
 		overflow: hidden;

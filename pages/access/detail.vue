@@ -220,7 +220,7 @@ export default {
 
 <style lang="scss">
 .card-content__body > view:not(:last-child) {
-	margin-bottom: 20px;
+	margin-bottom: 40rpx;
 }
 
 .timeline,
@@ -240,15 +240,15 @@ export default {
 		.applicant-name {
 			display: flex;
 			image {
-				width: 40px;
-				height: 40px;
+				width: 80rpx;
+				height: 80rpx;
 				border-radius: 50%;
 			}
 			& > view {
-				margin-left: 10px;
+				margin-left: 20rpx;
 				text:last-child {
+					font-size: 28rpx;
 					color: #333;
-					font-size: 14px;
 				}
 			}
 		}
@@ -261,25 +261,25 @@ export default {
 			display: flex;
 			flex-direction: column;
 			text {
-				line-height: 20px;
-				font-size: 12px;
+				line-height: 40rpx;
+				font-size: 24rpx;
 				color: #666;
 			}
 		}
 	}
 	.item-line {
 		width: 2px;
-		height: 30px;
-		margin: 5px 0;
-		margin-left: 20px;
+		height: 60rpx;
+		margin: 10rpx 0;
+		margin-left: 40rpx;
 		background-color: #dcdcdc;
 	}
 }
 
 .code {
 	&-item {
-		line-height: 24px;
-		padding: 0 20px;
+		line-height: 48rpx;
+		padding: 0 40rpx;
 		justify-content: space-between;
 		text {
 			&:first-child {
@@ -294,8 +294,8 @@ export default {
 		}
 	}
 	&-status {
-		padding: 0 10px;
-		border-radius: 4px;
+		padding: 0 20rpx;
+		border-radius: 8rpx;
 	}
 }
 

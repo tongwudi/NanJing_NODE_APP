@@ -48,7 +48,7 @@ export default {
 <style lang="scss">
 /deep/ .uni-navbar__content_view,
 /deep/ .uni-nav-bar-text {
-	font-size: 18px !important;
+	font-size: 36rpx !important;
 	font-weight: 700;
 }
 </style>

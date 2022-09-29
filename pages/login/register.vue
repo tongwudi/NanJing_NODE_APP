@@ -104,25 +104,14 @@ export default {
 			this.$refs[ref]
 				.validate()
 				.then(async data => {
-					uni.switchTab({
-						url: '/pages/home/index'
-					})
-					return
-					uni.showLoading({
-						title: '加载中',
-						mask: true
-					})
-					const res = await this.$request.post('/appLogin', { data })
-					uni.hideLoading()
-
-					if (res.code === 200) {
-						uni.showToast({ title: res.msg })
-					} else {
-						uni.showToast({
-							title: res.msg,
-							icon: 'error'
-						})
-					}
+					// if (res.code === 200) {
+					// 	uni.showToast({ title: res.msg })
+					// } else {
+					// 	uni.showToast({
+					// 		title: res.msg,
+					// 		icon: 'error'
+					// 	})
+					// }
 				})
 				.catch(err => {
 					console.log('err', err)
@@ -134,9 +123,9 @@ export default {
 
 <style lang="scss">
 .title {
-	padding: 20px;
+	padding: 40rpx;
 	line-height: 1.5;
-	font-size: 32px;
+	font-size: 64rpx;
 	font-weight: bold;
 	color: #1f1f39;
 }

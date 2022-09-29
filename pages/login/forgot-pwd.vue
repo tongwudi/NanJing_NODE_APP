@@ -29,10 +29,6 @@
 						v-model="formData.code"
 						placeholder="请输入验证码"
 					/>
-					<!-- <view class="code-row">
-						<uni-easyinput v-model="formData.code" />
-						<image src="/static/logo.png"></image>
-					</view> -->
 				</uni-forms-item>
 				<uni-forms-item label="新密码" name="password">
 					<uni-easyinput
@@ -84,24 +80,15 @@ export default {
 		submitForm(ref) {
 			this.$refs[ref]
 				.validate()
-				.then(async data => {
-					uni.switchTab({ url: '/pages/home/index' })
-					return
-					uni.showLoading({
-						title: '加载中',
-						mask: true
-					})
-					const res = await this.$request.post('/appLogin', { data })
-					uni.hideLoading()
-
-					if (res.code === 200) {
-						uni.showToast({ title: res.msg })
-					} else {
-						uni.showToast({
-							title: res.msg,
-							icon: 'error'
-						})
-					}
+				.then(data => {
+					// if (res.code === 200) {
+					// 	uni.showToast({ title: res.msg })
+					// } else {
+					// 	uni.showToast({
+					// 		title: res.msg,
+					// 		icon: 'error'
+					// 	})
+					// }
 				})
 				.catch(err => {
 					console.log('err', err)
@@ -113,9 +100,9 @@ export default {
 
 <style lang="scss">
 .title {
-	padding: 20px;
+	padding: 40rpx;
 	line-height: 1.5;
-	font-size: 32px;
+	font-size: 64rpx;
 	font-weight: bold;
 	color: #1f1f39;
 }
@@ -127,16 +114,6 @@ export default {
 
 /deep/ .uni-forms-item__label {
 	color: #333;
-}
-
-.code-row {
-	display: flex;
-
-	image {
-		width: 40%;
-		height: 37px;
-		margin-left: 20px;
-	}
 }
 
 .btn-row {

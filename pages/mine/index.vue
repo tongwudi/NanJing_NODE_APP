@@ -5,7 +5,7 @@
 		<image class="bg-top" src="@/static/img/bg-top.png"></image>
 
 		<view class="mx10">
-			<m-card padding="65px 0 15px 0">
+			<m-card padding="60px 0 10px 0">
 				<image class="avatar" src="@/static/img/avatar.png"></image>
 				<view class="h1">Hi, 张三</view>
 				<uni-title
@@ -34,13 +34,15 @@
 					:border="false"
 					@click="logout"
 				>
-					<template v-slot:header>
-						<uni-icons
-							custom-prefix="iconfont"
-							type="icon-tuichudenglu"
-							color="#78D7F5"
-							size="24"
-						></uni-icons>
+					<template #header>
+						<view class="uni-list-item__header">
+							<uni-icons
+								custom-prefix="iconfont"
+								type="icon-tuichudenglu"
+								color="#78D7F5"
+								size="24"
+							></uni-icons>
+						</view>
 					</template>
 				</uni-list-item>
 			</uni-list>
@@ -64,7 +66,6 @@ export default {
 	methods: {
 		logout() {
 			uni.clearStorageSync()
-			console.log(112)
 		}
 	}
 }
@@ -72,11 +73,11 @@ export default {
 
 <style lang="scss">
 .container {
-	padding-top: 64px;
+	padding-top: 128rpx;
 }
 .h1 {
-	margin-bottom: 8px;
-	font-size: 24px;
+	margin-bottom: 16rpx;
+	font-size: 48rpx;
 	font-weight: bold;
 	text-align: center;
 }
@@ -85,21 +86,21 @@ export default {
 	top: 0;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	width: 60px;
-	height: 80px;
+	width: 120rpx;
+	height: 160rpx;
 }
 .mx10 {
-	margin: 0 10px;
+	margin: 0 20rpx;
 }
 .uni-list {
-	margin-top: 15px;
+	margin-top: 30rpx;
 }
 /deep/ {
 	.uni-list-item__container {
-		padding: 15px 10px;
+		padding: 30rpx 20rpx;
 	}
 	.uni-list-item__content-title {
-		font-size: 16px !important;
+		font-size: 32rpx !important;
 		color: #333 !important;
 	}
 	.uni-list-item__icon-img {
@@ -107,6 +108,6 @@ export default {
 	}
 }
 .icon-tuichudenglu {
-	margin-right: 9px;
+	margin-right: 18rpx;
 }
 </style>

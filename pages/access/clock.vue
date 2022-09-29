@@ -116,15 +116,15 @@ export default {
 <style lang="scss">
 .code-row {
 	flex-direction: column;
-	margin: 0 25px;
+	margin: 0 50rpx;
 	.row-label {
-		font-size: 16px;
-		margin-bottom: 20px;
+		font-size: 32rpx;
+		margin-bottom: 40rpx;
 		text-align: center;
 		color: #666;
 	}
 	.uni-easyinput {
-		margin-bottom: 24px;
+		margin-bottom: 48rpx;
 	}
 }
 </style>

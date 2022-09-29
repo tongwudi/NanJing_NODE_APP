@@ -96,17 +96,11 @@ export default {
 			this.$refs[ref]
 				.validate()
 				.then(async data => {
-					uni.showLoading({
-						title: '加载中',
-						mask: true
-					})
-
 					const params = {
 						...this.formData,
 						password: encrypt(this.formData.password)
 					}
 					const res = await appLogin(params)
-					uni.hideLoading()
 
 					if (res.code === 200) {
 						this.SET_TOKEN(res.token)
@@ -132,7 +126,7 @@ export default {
 
 <style lang="scss">
 .container {
-	padding: 20px;
+	padding: 40rpx;
 	background-image: linear-gradient(
 		to right bottom,
 		rgba(250, 255, 217, 0.3),
@@ -142,9 +136,9 @@ export default {
 }
 
 .title {
-	padding: 44px 0;
+	padding: 88rpx 0;
 	line-height: 1.5;
-	font-size: 32px;
+	font-size: 64rpx;
 	font-weight: bold;
 	color: #1f1f39;
 }
@@ -176,7 +170,7 @@ export default {
 
 	image {
 		width: 40%;
-		margin-left: 20px;
+		margin-left: 40rpx;
 	}
 }
 
@@ -201,7 +195,7 @@ navigator {
 }
 
 .register-row {
-	margin: 20px;
+	margin: 40rpx;
 	display: flex;
 	justify-content: center;
 

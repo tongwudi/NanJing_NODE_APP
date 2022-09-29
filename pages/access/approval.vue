@@ -200,21 +200,21 @@ export default {
 
 .select-row {
 	display: flex;
-	margin: 10px;
+	margin: 20rpx;
 	/deep/ {
 		.input-value-border {
 			border: 1px solid #b1daff;
 			background: #fff;
 		}
 		.input-value {
-			height: 40px;
+			height: 72rpx;
 		}
 	}
 	button {
-		margin-left: 15px;
-		line-height: 40px;
-		font-size: 12px;
-		border-radius: 6px;
+		margin-left: 30rpx;
+		line-height: 72rpx;
+		font-size: 24rpx;
+		border-radius: 12rpx;
 	}
 	button[type='primary'] {
 		background-image: linear-gradient(to right, #12aaff, #14e3f0);
@@ -224,7 +224,7 @@ export default {
 		color: #585858;
 		&::after {
 			border: 2px solid #b1daff;
-			border-radius: 12px;
+			border-radius: 24rpx;
 		}
 	}
 }
