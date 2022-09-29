@@ -136,15 +136,11 @@ export default {
 }
 
 .title {
-	padding: 88rpx 0;
+	padding: 88rpx 0 70rpx;
 	line-height: 1.5;
 	font-size: 64rpx;
 	font-weight: bold;
 	color: #1f1f39;
-}
-
-.uni-forms {
-	flex: 1;
 }
 
 /deep/ {
@@ -154,14 +150,14 @@ export default {
 
 	.uni-forms-item__label {
 		padding: 0 !important;
-		height: 30px !important;
+		height: 60rpx !important;
 		line-height: 1 !important;
 		color: #858597;
 	}
 
 	image,
 	.uni-easyinput__content-input {
-		height: 88rpx !important;
+		height: 80rpx !important;
 	}
 }
 
@@ -191,11 +187,11 @@ navigator {
 }
 
 .btn-row {
-	margin: 88rpx 0 0;
+	margin: 80rpx 0 0;
 }
 
 .register-row {
-	margin: 40rpx;
+	margin-top: 40rpx;
 	display: flex;
 	justify-content: center;
 
