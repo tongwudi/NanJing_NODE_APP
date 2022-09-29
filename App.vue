@@ -42,8 +42,10 @@ page {
 }
 
 .bg-top {
-	background-image: url(/static/img/bg-top.png);
-	background-size: 100% 160px;
-	background-repeat: no-repeat;
+	position: fixed;
+	top: 0%;
+	width: 100%;
+	height: 160px;
+	z-index: -1;
 }
 </style>

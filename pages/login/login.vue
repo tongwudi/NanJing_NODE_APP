@@ -30,21 +30,22 @@
 			<uni-forms-item label="验证码" name="code">
 				<view class="code-row">
 					<uni-easyinput v-model="formData.code" />
-					<image :src="codeUrl" @tap="getCodeUrl"></image>
-					<!-- <image src="/static/logo.png"></image> -->
+					<image :src="codeUrl" @click="getCodeUrl"></image>
 				</view>
 			</uni-forms-item>
 			<view class="settings-row">
 				<checkbox-group @change="changeRemember">
 					<label>
-						<checkbox value="1" style="transform:scale(0.75)" />
+						<checkbox value="1" style="transform: scale(0.75)" />
 						<text>记住密码</text>
 					</label>
 				</checkbox-group>
 				<navigator url="./forgot-pwd">忘记密码</navigator>
 			</view>
 			<view class="btn-row">
-				<button type="primary" @tap="submitLogin('loginForm')">登录</button>
+				<button type="primary" @click="submitLogin('loginForm')">
+					登录
+				</button>
 			</view>
 			<view class="register-row">
 				<text>还没有账号？</text>
@@ -55,9 +56,9 @@
 </template>
 
 <script>
-import { phonenumber, password, code } from '@/config/verification.js'
+import { phonenumber, password, code } from '@/utils/verification.js'
 import { captchaImage, appLogin } from '@/api/index.js'
-import { encrypt, decrypt } from '@/config/jsencrypt.js'
+import { encrypt, decrypt } from '@/utils/rsa.js'
 import { mapMutations, mapActions } from 'vuex'
 export default {
 	data() {
@@ -99,10 +100,6 @@ export default {
 						title: '加载中',
 						mask: true
 					})
-
-					// uni.hideLoading()
-					// uni.switchTab({ url: '/pages/home/index' })
-					// return
 
 					const params = {
 						...this.formData,

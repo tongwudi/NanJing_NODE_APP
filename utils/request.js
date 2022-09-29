@@ -138,7 +138,8 @@ if (!global.$request) {
 
 
 global.$request.setConfig({
-	baseUrl: 'api',
+	// app不支持 api 代理，要写完整地址
+	baseUrl: 'http://2c7255v996.51vip.biz',
 	header: {
 		'content-type': 'application/json'
 	}

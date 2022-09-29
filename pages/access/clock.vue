@@ -1,6 +1,8 @@
 <template>
-	<view class="container bg-top">
+	<view class="container">
 		<view class="status_bar"><!-- 这里是状态栏 --></view>
+
+		<image class="bg-top" src="@/static/img/bg-top.png"></image>
 
 		<m-nav left-icon="left" right-icon="scan" title="进出机房申请"></m-nav>
 
@@ -62,14 +64,20 @@
 					</view>
 
 					<view class="btn-row">
-						<button type="primary" @tap="submitValid">提交验证</button>
+						<button type="primary" @click="submitValid">
+							提交验证
+						</button>
 					</view>
 				</view>
 			</m-card>
 
-			<view class="btn-row"><button type="primary">访客打卡</button></view>
+			<view class="btn-row">
+				<button type="primary">访客打卡</button>
+			</view>
 
-			<view class="btn-row"><button type="primary">访客离开打卡</button></view>
+			<view class="btn-row">
+				<button type="primary">访客离开打卡</button>
+			</view>
 		</view>
 	</view>
 </template>

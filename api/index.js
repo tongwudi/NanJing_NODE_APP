@@ -1,4 +1,4 @@
-import http from '@/config/request.js'
+import http from '@/utils/request.js'
 
 // 验证码
 export const captchaImage = () => http.get('/captchaImage')

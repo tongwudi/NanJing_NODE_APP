@@ -1,6 +1,8 @@
 <template>
-	<view class="container bg-top">
+	<view class="container">
 		<view class="status_bar"><!-- 这里是状态栏 --></view>
+
+		<image class="bg-top" src="@/static/img/bg-top.png"></image>
 
 		<view class="nav">
 			<m-nav left-icon="left"></m-nav>
@@ -9,9 +11,17 @@
 		</view>
 
 		<m-card>
-			<uni-forms ref="form" :labelWidth="75" :model="formData" :rules="rules">
+			<uni-forms
+				ref="form"
+				:labelWidth="75"
+				:model="formData"
+				:rules="rules"
+			>
 				<uni-forms-item label="姓名" name="name">
-					<uni-easyinput v-model="formData.name" placeholder="请输入姓名" />
+					<uni-easyinput
+						v-model="formData.name"
+						placeholder="请输入姓名"
+					/>
 				</uni-forms-item>
 				<uni-forms-item label="手机号" name="phonenumber">
 					<uni-easyinput
@@ -27,7 +37,10 @@
 					/>
 				</uni-forms-item>
 				<uni-forms-item label="邮箱" name="email">
-					<uni-easyinput v-model="formData.email" placeholder="请输入邮箱" />
+					<uni-easyinput
+						v-model="formData.email"
+						placeholder="请输入邮箱"
+					/>
 				</uni-forms-item>
 				<uni-forms-item label="密码" name="password">
 					<uni-easyinput
@@ -45,7 +58,9 @@
 				</uni-forms-item>
 
 				<view class="btn-row">
-					<button type="primary" @tap="changePass('form')">确认</button>
+					<button type="primary" @click="changePass('form')">
+						确认
+					</button>
 				</view>
 			</uni-forms>
 		</m-card>
@@ -60,7 +75,7 @@ import {
 	email,
 	password,
 	confirmPass
-} from '@/config/verification.js'
+} from '@/utils/verification.js'
 export default {
 	data() {
 		return {
@@ -83,9 +98,6 @@ export default {
 			},
 			codeUrl: ''
 		}
-	},
-	created() {
-		console.log(name)
 	},
 	methods: {
 		changePass(ref) {

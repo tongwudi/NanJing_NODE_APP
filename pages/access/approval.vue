@@ -1,6 +1,8 @@
 <template>
-	<view class="container bg-top">
+	<view class="container">
 		<view class="status_bar"><!-- 这里是状态栏 --></view>
+
+		<image class="bg-top" src="@/static/img/bg-top.png"></image>
 
 		<view class="nav">
 			<m-nav title="进出机房审批" right-icon="scan"></m-nav>
@@ -10,7 +12,7 @@
 					class="tab-item"
 					v-for="(tab, index) in tabs"
 					:key="index"
-					@tap="changeTab(index)"
+					@click="changeTab(index)"
 				>
 					<text :class="tabIndex == index ? 'tab-item-active' : ''">
 						{{ tab.name }}
@@ -19,7 +21,7 @@
 			</view>
 		</view>
 
-		<view class="content" v-if="tabIndex === 0">
+		<view class="content" v-show="tabIndex === 0">
 			<view class="select-row">
 				<uni-data-picker
 					placeholder="请选择进出类型"
@@ -27,7 +29,10 @@
 					:readonly="isOpened"
 					:localdata="applyTypeList"
 				></uni-data-picker>
-				<button :type="isOpened ? 'primary' : 'default'" @tap="batchClick">
+				<button
+					:type="isOpened ? 'primary' : 'default'"
+					@click="batchClick"
+				>
 					{{ isOpened ? '批量通过' : '批量操作' }}
 				</button>
 			</view>
@@ -38,7 +43,7 @@
 						<m-card @tapClick="viewDetail">
 							<view class="card-content__body">
 								<view class="applicant">
-									<image src="../../static/logo.png"></image>
+									<image src="@/static/logo.png"></image>
 									<view>
 										<text>申请人</text>
 										<text>张三</text>
@@ -62,13 +67,18 @@
 			</checkbox-group>
 		</view>
 
-		<view class="content" v-else-if="tabIndex === 1">
+		<view class="content" v-show="tabIndex === 1">
 			<m-card v-for="index in 8" :key="index" @tapClick="viewDetail">
 				<template v-slot:other>
-					<view class="card-status" :class="renderStatusBgColor(index)">
+					<view
+						class="card-status"
+						:class="[renderStatusBgColor(index)]"
+					>
 						{{ index | filterStatusText }}
 					</view>
-					<button class="cancel-btn" @tap.stop="revoke">撤销</button>
+					<button class="cancel-btn" @click.stop="revoke">
+						撤销
+					</button>
 				</template>
 
 				<view class="card-content__body">
@@ -149,8 +159,13 @@ export default {
 			this.tabIndex = index
 		},
 		batchClick() {
-			if (this.isOpened && this.batchIds.length) {
-				// 发起请求
+			if (this.isOpened && this.batchIds.length > 0) {
+				// 提交批量审批，重新加载数据列表，清空已选中
+				
+				// for(let key of approval) {
+				// 	key.checked = false
+				// }
+				// this.batchIds = []
 			}
 			this.isOpened = !this.isOpened
 		},
@@ -182,9 +197,10 @@ export default {
 .status-reject {
 	background-image: linear-gradient(to right, #ffcea1, #ffa5a5);
 }
+
 .select-row {
 	display: flex;
-	margin: 0 10px 10px;
+	margin: 10px;
 	/deep/ {
 		.input-value-border {
 			border: 1px solid #b1daff;
@@ -212,11 +228,15 @@ export default {
 		}
 	}
 }
+
 .swipe-box {
 	display: flex;
 	align-items: center;
 	&_right {
 		text-align: center;
+	}
+	.card {
+		margin-top: 0;
 	}
 }
 </style>

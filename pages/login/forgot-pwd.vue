@@ -1,6 +1,8 @@
 <template>
-	<view class="container bg-top">
+	<view class="container">
 		<view class="status_bar"><!-- 这里是状态栏 --></view>
+
+		<image class="bg-top" src="@/static/img/bg-top.png"></image>
 
 		<view class="nav">
 			<m-nav left-icon="left"></m-nav>
@@ -23,7 +25,10 @@
 					/>
 				</uni-forms-item>
 				<uni-forms-item label="验证码" name="code">
-					<uni-easyinput v-model="formData.code" placeholder="请输入验证码" />
+					<uni-easyinput
+						v-model="formData.code"
+						placeholder="请输入验证码"
+					/>
 					<!-- <view class="code-row">
 						<uni-easyinput v-model="formData.code" />
 						<image src="/static/logo.png"></image>
@@ -45,7 +50,9 @@
 				</uni-forms-item>
 
 				<view class="btn-row">
-					<button type="primary" @tap="submitForm('registerForm')">提交</button>
+					<button type="primary" @click="submitForm('registerForm')">
+						提交
+					</button>
 				</view>
 			</uni-forms>
 		</m-card>
@@ -53,7 +60,7 @@
 </template>
 
 <script>
-import { email, verify, password, confirmPass } from '@/config/verification.js'
+import { email, verify, password, confirmPass } from '@/utils/verification.js'
 export default {
 	data() {
 		return {

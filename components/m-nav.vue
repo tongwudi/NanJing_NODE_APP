@@ -1,8 +1,10 @@
 <template>
 	<uni-nav-bar
-		v-bind="$attrs"
 		color="#1F1F39"
 		backgroundColor="transparent"
+		:leftIcon="leftIcon"
+		:rightIcon="rightIcon"
+		:title="title"
 		:border="false"
 		@clickLeft="back"
 		@clickRight="scanCode"
@@ -11,7 +13,20 @@
 
 <script>
 export default {
-	inheritAttrs: false, // 不在组件根元素 dom 上显示属性
+	props: {
+		title: {
+			type: String,
+			default: ''
+		},
+		leftIcon: {
+			type: String,
+			default: ''
+		},
+		rightIcon: {
+			type: String,
+			default: ''
+		}
+	},
 	methods: {
 		back() {
 			uni.navigateBack({ delta: 1 })

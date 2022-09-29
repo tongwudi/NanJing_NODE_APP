@@ -68,21 +68,6 @@
     "mp-toutiao" : {
         "usingComponents" : true
     },
-		"h5" : {
-			"devServer" : {
-			  "https" : false,
-				"proxy" : {
-				  "/api" : {
-				    "target" : "http://2c7255v996.51vip.biz",
-				    "changeOrigin" : true,
-				    "secure" : false,
-				    "pathRewrite" : {
-				        "^/api" : ""
-				    }
-				  }
-				}
-			}
-		},
     "uniStatistics" : {
         "enable" : false
     },

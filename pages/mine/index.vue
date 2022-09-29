@@ -1,46 +1,50 @@
 <template>
-	<view class="container bg-top">
+	<view class="container">
 		<view class="status_bar"><!-- 这里是状态栏 --></view>
 
-		<m-card padding="60px 0 10px 0">
-			<image src="../../static/img/avatar.png"></image>
-			<view class="h1">Hi, 张三</view>
-			<uni-title
-				type="h3"
-				align="center"
-				color="#666"
-				title="15005148799"
-			></uni-title>
-		</m-card>
+		<image class="bg-top" src="@/static/img/bg-top.png"></image>
 
-		<uni-list :border="false">
-			<uni-list-item
-				showExtraIcon
-				showArrow
-				clickable
-				title="修改密码"
-				to="../login/forgot-pwd"
-				:border="false"
-				:extraIcon="lockedIcon"
-			/>
-			<uni-list-item
-				showExtraIcon
-				showArrow
-				clickable
-				title="退出登录"
-				:border="false"
-				@click="logout"
-			>
-				<template v-slot:header>
-					<uni-icons
-						custom-prefix="iconfont"
-						type="icon-tuichudenglu"
-						color="#78D7F5"
-						size="24"
-					></uni-icons>
-				</template>
-			</uni-list-item>
-		</uni-list>
+		<view class="mx10">
+			<m-card padding="65px 0 15px 0">
+				<image class="avatar" src="@/static/img/avatar.png"></image>
+				<view class="h1">Hi, 张三</view>
+				<uni-title
+					type="h3"
+					align="center"
+					color="#666"
+					title="15005148799"
+				></uni-title>
+			</m-card>
+
+			<uni-list :border="false">
+				<uni-list-item
+					showExtraIcon
+					showArrow
+					clickable
+					title="修改密码"
+					to="../login/forgot-pwd"
+					:border="false"
+					:extraIcon="lockedIcon"
+				/>
+				<uni-list-item
+					showExtraIcon
+					showArrow
+					clickable
+					title="退出登录"
+					:border="false"
+					@click="logout"
+				>
+					<template v-slot:header>
+						<uni-icons
+							custom-prefix="iconfont"
+							type="icon-tuichudenglu"
+							color="#78D7F5"
+							size="24"
+						></uni-icons>
+					</template>
+				</uni-list-item>
+			</uni-list>
+		</view>
 	</view>
 </template>
 
@@ -68,7 +72,6 @@ export default {
 
 <style lang="scss">
 .container {
-	padding: 10px;
 	padding-top: 64px;
 }
 .h1 {
@@ -77,13 +80,16 @@ export default {
 	font-weight: bold;
 	text-align: center;
 }
-image {
+.avatar {
 	position: absolute;
 	top: 0;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	width: 60px;
 	height: 80px;
+}
+.mx10 {
+	margin: 0 10px;
 }
 .uni-list {
 	margin-top: 15px;
@@ -93,8 +99,8 @@ image {
 		padding: 15px 10px;
 	}
 	.uni-list-item__content-title {
-		font-size: 16px;
-		color: #333;
+		font-size: 16px !important;
+		color: #333 !important;
 	}
 	.uni-list-item__icon-img {
 		margin-right: 0;

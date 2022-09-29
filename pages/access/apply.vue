@@ -1,6 +1,8 @@
 <template>
-	<view class="container bg-top">
+	<view class="container">
 		<view class="status_bar"><!-- 这里是状态栏 --></view>
+
+		<image class="bg-top" src="@/static/img/bg-top.png"></image>
 
 		<view class="nav">
 			<m-nav title="进出机房申请" right-icon="scan"></m-nav>
@@ -10,7 +12,7 @@
 					class="tab-item"
 					v-for="(tab, index) in tabs"
 					:key="index"
-					@tap="changeTab(index)"
+					@click="changeTab(index)"
 				>
 					<text :class="tabIndex == index ? 'tab-item-active' : ''">
 						{{ tab.name }}
@@ -19,7 +21,7 @@
 			</view>
 		</view>
 
-		<view class="content" v-if="tabIndex === 0">
+		<view class="content" v-show="tabIndex === 0">
 			<uni-forms
 				ref="applyForm"
 				validate-trigger="bind"
@@ -61,7 +63,10 @@
 							></uni-data-picker>
 						</uni-forms-item>
 						<uni-forms-item label="申请时间" name="applyTime">
-							<uni-datetime-picker type="date" v-model="formData.applyTime" />
+							<uni-datetime-picker
+								type="date"
+								v-model="formData.applyTime"
+							/>
 						</uni-forms-item>
 						<uni-forms-item label="实施时间" name="workTime">
 							<uni-datetime-picker
@@ -130,13 +135,20 @@
 							<uni-icons
 								class="fr"
 								size="20"
-								:type="index === staffList.length - 1 ? 'plus' : 'minus'"
-								@tap="changeStaff(index)"
+								:type="
+									index === staffList.length - 1
+										? 'plus'
+										: 'minus'
+								"
+								@click="changeStaff(index)"
 							></uni-icons>
 						</template>
 						<view class="card-content__body">
 							<uni-forms-item label="姓名">
-								<uni-easyinput v-model="item.applyName" placeholder="请输入" />
+								<uni-easyinput
+									v-model="item.applyName"
+									placeholder="请输入"
+								/>
 							</uni-forms-item>
 							<uni-forms-item label="联系电话">
 								<uni-easyinput
@@ -155,22 +167,35 @@
 					</m-card>
 
 					<view class="btn-row">
-						<button type="primary" @tap="submitForm('applyForm')">提交</button>
+						<button type="primary" @click="submitForm('applyForm')">
+							提交
+						</button>
 					</view>
 				</view>
 			</uni-forms>
 		</view>
 
-		<view class="content" v-else-if="tabIndex === 1">
-			<m-card v-for="index in 8" :key="index" @tapClick="viewDetail(index)">
+		<view class="content" v-show="tabIndex === 1">
+			<m-card
+				v-for="index in 8"
+				:key="index"
+				@tapClick="viewDetail(index)"
+			>
 				<template v-slot:other>
-					<view class="card-status" :class="renderStatusBgColor(index)">
+					<view
+						class="card-status"
+						:class="[renderStatusBgColor(index)]"
+					>
 						{{ index | filterStatusText }}
 					</view>
 					<button
 						class="cancel-btn"
-						v-if="index % 2 === 0 || index % 3 === 0 || index % 7 === 0"
-						@tap.stop="revoke"
+						v-if="
+							index % 2 === 0 ||
+								index % 3 === 0 ||
+								index % 7 === 0
+						"
+						@click.stop="revoke"
 					>
 						撤销
 					</button>
@@ -210,7 +235,7 @@
 </template>
 
 <script>
-import { verify } from '@/config/verification.js'
+import { verify } from '@/utils/verification.js'
 import {
 	startApply,
 	getCounty,
@@ -250,7 +275,8 @@ export default {
 			roomList: [],
 			leaderList: [],
 			applyTypeList: [],
-			staffList: [{}]
+			staffList: [{}],
+			files: []
 		}
 	},
 	computed: {
@@ -276,13 +302,29 @@ export default {
 		}
 	},
 	onLoad() {
+		uni.showLoading({ title: '加载中', mask: true })
 		Promise.all([
 			this.getCountyList(),
 			this.getLeaderList(),
 			this.getApplyTypeList()
-		])
+		]).then(() => {
+			uni.hideLoading()
+		})
 	},
 	methods: {
+		renderStatusBgColor(index) {
+			if (index % 2 === 0) {
+				return 'status-2'
+			} else if (index % 3 === 0) {
+				return 'status-3'
+			} else if (index % 5 === 0) {
+				return 'status-4'
+			} else if (index % 7 === 0) {
+				return 'status-5'
+			} else {
+				return 'status-1'
+			}
+		},
 		async getCountyList() {
 			const { code, data } = await getCounty()
 			if (code === 200) {
@@ -366,20 +408,9 @@ export default {
 					})
 				})
 		},
-		renderStatusBgColor(index) {
-			if (index % 2 === 0) {
-				return 'status-2'
-			} else if (index % 3 === 0) {
-				return 'status-3'
-			} else if (index % 5 === 0) {
-				return 'status-4'
-			} else if (index % 7 === 0) {
-				return 'status-5'
-			} else {
-				return 'status-1'
-			}
-		},
 		changeTab(index) {
+			if (this.tabIndex === index) return
+			console.log(1)
 			this.tabIndex = index
 		},
 		viewDetail(index) {

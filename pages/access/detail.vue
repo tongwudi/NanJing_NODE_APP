@@ -1,6 +1,8 @@
 <template>
-	<view class="container bg-top">
+	<view class="container">
 		<view class="status_bar"><!-- 这里是状态栏 --></view>
+
+		<image class="bg-top" src="@/static/img/bg-top.png"></image>
 
 		<m-nav left-icon="left" right-icon="scan" title="进出机房申请"></m-nav>
 
@@ -9,48 +11,49 @@
 				<view class="card-content__body">
 					<view>
 						<text>行政区域</text>
-						<text>建邺区</text>
+						<text class="bold">建邺区</text>
 					</view>
 					<view>
 						<text>机房名称</text>
-						<text>南京建邺区国家广告产业园C座301</text>
+						<text class="bold">南京建邺区国家广告产业园C座301</text>
 					</view>
 					<view>
 						<text>申请单位</text>
-						<text>建邺分公司</text>
+						<text class="bold">建邺分公司</text>
 					</view>
 					<view>
 						<text>项目经理</text>
-						<text>王大</text>
+						<text class="bold">王大</text>
 					</view>
 					<view>
 						<text>申请时间</text>
-						<text>2022/07/19</text>
+						<text class="bold">2022/07/19</text>
 					</view>
 					<view>
 						<text>实施时间</text>
-						<text>2022/07/20 08:00~2022/07/2</text>
+						<text class="bold">2022/07/20 08:00~2022/07/2</text>
 					</view>
 					<view>
 						<text>所属项目</text>
-						<text>南京机房智能运维支撑平台</text>
+						<text class="bold">南京机房智能运维支撑平台</text>
 					</view>
 					<view>
 						<text>所属专业</text>
-						<text>传输</text>
+						<text class="bold">传输</text>
 					</view>
 					<view>
 						<text>施工单位</text>
-						<text>XXX</text>
+						<text class="bold">XXX</text>
 					</view>
 					<view>
 						<text>进出类型</text>
-						<text>巡检勘察</text>
+						<text class="bold">巡检勘察</text>
 					</view>
 					<view>
 						<text>施工内容</text>
-						<text class="wrap">
-							将空调换个位置将空调换个位 将空调换个位置将空调换个位
+						<text class="wrap bold">
+							将空调换个位置将空调换个位
+							将空调换个位置将空调换个位
 							将空调换个位置将空调换个位 将空调换个位置
 						</text>
 					</view>
@@ -72,15 +75,15 @@
 					<view class="card-content__body">
 						<view>
 							<text>姓名</text>
-							<text>王五</text>
+							<text class="bold">王五</text>
 						</view>
 						<view>
 							<text>联系电话</text>
-							<text>15005148799</text>
+							<text class="bold">15005148799</text>
 						</view>
 						<view>
 							<text>身份号码</text>
-							<text>326459458745254568</text>
+							<text class="bold">326459458745254568</text>
 						</view>
 					</view>
 				</m-card>
@@ -98,7 +101,7 @@
 								</view>
 							</view>
 							<view class="applicant-status flx-clm">
-								<text :class="renderStatusColor(index)">
+								<text :class="[renderStatusColor(index)]">
 									{{ index | filterStatusText }}
 								</text>
 								<text>2022/07/27 14:00</text>
@@ -117,7 +120,10 @@
 					</view>
 					<view class="code-item">
 						<text>验证码状态</text>
-						<text class="code-status" :class="renderStatusColor(2)">
+						<text
+							class="code-status"
+							:class="[renderStatusColor(2)]"
+						>
 							{{ 2 | filterStatusText }}
 						</text>
 					</view>
@@ -125,8 +131,8 @@
 			</m-card>
 
 			<view class="btn-row">
-				<button type="warn" @tap="rejectClick">驳回</button>
-				<button type="primary" @tap="passClick">通过</button>
+				<button type="warn" @click="rejectClick">驳回</button>
+				<button type="primary" @click="passClick">通过</button>
 			</view>
 			<view class="btn-row">
 				<button type="info">取消</button>

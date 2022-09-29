@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import request from '@/config/request.js'
+import request from '@/utils/request.js'
 import { getInfo } from '@/api/index.js'
 
 Vue.use(Vuex)
