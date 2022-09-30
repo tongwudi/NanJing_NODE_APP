@@ -25,21 +25,23 @@
 			<view class="select-row">
 				<uni-data-picker
 					placeholder="请选择进出类型"
+					v-model="applyType"
 					:clear-icon="false"
-					:readonly="isOpened"
+					:readonly="isChecked"
 					:localdata="applyTypeList"
+					@change="changeApplyType"
 				></uni-data-picker>
 				<button
-					:type="isOpened ? 'primary' : 'default'"
+					:type="isChecked ? 'primary' : 'default'"
 					@click="batchClick"
 				>
-					{{ isOpened ? '批量通过' : '批量操作' }}
+					{{ isChecked ? '批量通过' : '批量操作' }}
 				</button>
 			</view>
 
-			<checkbox-group @change="checkboxChange">
+			<checkbox-group @change="checkedChange">
 				<uni-row class="swipe-box" v-for="index in 8" :key="index">
-					<uni-col :span="isOpened ? 21 : 24">
+					<uni-col :span="isChecked ? 21 : 24">
 						<m-card @tapClick="viewDetail">
 							<view class="card-content__body">
 								<view class="applicant">
@@ -60,7 +62,7 @@
 							</view>
 						</m-card>
 					</uni-col>
-					<uni-col class="swipe-box_right" :span="isOpened ? 3 : 0">
+					<uni-col class="swipe-box_right" :span="isChecked ? 3 : 0">
 						<checkbox :value="index + ''" />
 					</uni-col>
 				</uni-row>
@@ -114,25 +116,17 @@
 </template>
 
 <script>
-import { searchTodo } from '@/api/index.js'
+import { getApplyType, searchTodo } from '@/api/index.js'
 export default {
 	data() {
 		return {
 			tabs: [{ name: '待审批' }, { name: '审批记录' }],
 			tabIndex: 0,
-			applyTypeList: [
-				{ text: '巡检', value: 1 },
-				{ text: '勘察', value: 2 },
-				{ text: '维修', value: 3 },
-				{ text: '跳纤', value: 4 },
-				{ text: '设备安装', value: 5 },
-				{ text: '空调移机', value: 6 },
-				{ text: '设备移机', value: 7 },
-				{ text: '设备退网', value: 8 },
-				{ text: '其他', value: 9 }
-			],
-			isOpened: false,
-			batchIds: []
+			applyTypeList: [],
+			applyType: '',
+			isChecked: false,
+			batchIds: [],
+			pageNum: 1
 		}
 	},
 	filters: {
@@ -145,7 +139,7 @@ export default {
 		}
 	},
 	onLoad() {
-		this.getList()
+		Promise.all([/*this.getList(), */ this.getApplyTypeList()])
 	},
 	methods: {
 		renderStatusBgColor(index) {
@@ -155,27 +149,46 @@ export default {
 				return 'status-reject'
 			}
 		},
+		async getApplyTypeList() {
+			const { code, data } = await getApplyType()
+			if (code === 200) {
+				this.applyTypeList = data.map(item => {
+					return {
+						text: item.applyTypeName,
+						value: item.applyTypeId
+					}
+				})
+			}
+		},
+		changeApplyType(e) {
+			const { value } = e.detail.value[0]
+			this.applyType = value
+			// this.getList()
+		},
+		async getList() {
+			const params = {
+				applyType: this.applyType,
+				pageNum: this.pageNum
+			}
+			const res = await searchTodo(params)
+			console.log(res)
+		},
 		changeTab(index) {
 			this.tabIndex = index
 		},
 		batchClick() {
-			if (this.isOpened && this.batchIds.length > 0) {
+			if (this.isChecked && this.batchIds.length > 0) {
 				// 提交批量审批，重新加载数据列表，清空已选中
-				
 				// for(let key of approval) {
 				// 	key.checked = false
 				// }
 				// this.batchIds = []
 			}
-			this.isOpened = !this.isOpened
+			this.isChecked = !this.isChecked
 		},
-		checkboxChange(e) {
+		checkedChange(e) {
 			const values = e.detail.value
 			this.batchIds = values
-		},
-		async getList() {
-			const res = await searchTodo()
-			console.log(res)
 		},
 		viewDetail() {
 			uni.navigateTo({ url: './detail' })

@@ -10,6 +10,7 @@
 		<uni-forms
 			ref="loginForm"
 			label-position="top"
+			err-show-type="toast"
 			:model="formData"
 			:rules="rules"
 		>
@@ -56,7 +57,7 @@
 </template>
 
 <script>
-import { phonenumber, password, code } from '@/utils/verification.js'
+import { phonenumber, password, verify } from '@/utils/verification.js'
 import { captchaImage, appLogin } from '@/api/index.js'
 import { encrypt, decrypt } from '@/utils/rsa.js'
 import { mapMutations, mapActions } from 'vuex'
@@ -72,7 +73,7 @@ export default {
 			rules: {
 				phonenumber,
 				password,
-				code
+				code: verify('验证码', 'input')
 			},
 			codeUrl: '',
 			isRememberPwd: false

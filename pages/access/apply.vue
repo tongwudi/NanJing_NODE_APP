@@ -24,8 +24,8 @@
 		<view class="content" v-show="tabIndex === 0">
 			<uni-forms
 				ref="applyForm"
-				validate-trigger="bind"
-				:labelWidth="75"
+				err-show-type="toast"
+				:label-width="75"
 				:model="formData"
 				:rules="rules"
 			>
@@ -110,7 +110,7 @@
 								placeholder="请输入"
 							/>
 						</uni-forms-item>
-						<!-- <uni-forms-item class="upload" label="附件">
+						<uni-forms-item class="upload" label="附件">
 							<uni-file-picker
 								limit="5"
 								file-mediatype="all"
@@ -120,7 +120,7 @@
 							>
 								<button>+ 上传文件</button>
 							</uni-file-picker>
-						</uni-forms-item> -->
+						</uni-forms-item>
 					</view>
 				</m-card>
 
@@ -394,12 +394,14 @@ export default {
 				})
 				.catch(err => {
 					console.log('err', err)
-
-					uni.showToast({
-						icon: 'error',
-						title: '请检查输入'
-					})
 				})
+		},
+		onPullDownRefresh() {
+			// 获取申请记录列表
+			setTimeout(() => {
+				console.log(111)
+				uni.stopPullDownRefresh()
+			}, 2000)
 		},
 		changeTab(index) {
 			if (this.tabIndex === index) return

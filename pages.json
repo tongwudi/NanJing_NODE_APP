@@ -27,13 +27,14 @@
 		{
 			"path": "pages/access/apply",
 			"style": {
-				"navigationBarTitleText": "申请人"
+				"navigationBarTitleText": "进出机房申请",
+				"enablePullDownRefresh" : true
 			}
 		},
 		{
 			"path": "pages/access/approval",
 			"style": {
-				"navigationBarTitleText": "审批人-项目经理"
+				"navigationBarTitleText": "进出机房审批"
 			}
 		},
 		{

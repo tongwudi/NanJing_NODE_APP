@@ -13,6 +13,7 @@
 		<m-card>
 			<uni-forms
 				ref="form"
+				err-show-type="toast"
 				:labelWidth="75"
 				:model="formData"
 				:rules="rules"

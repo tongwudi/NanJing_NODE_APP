@@ -29,9 +29,11 @@ export default {
 	},
 	methods: {
 		back() {
+			if (!this.leftIcon) return
 			uni.navigateBack({ delta: 1 })
 		},
 		scanCode() {
+			if (!this.rightIcon) return
 			// 允许从相机和相册扫码
 			uni.scanCode({
 				success: res => {
