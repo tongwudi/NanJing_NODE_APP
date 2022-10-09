@@ -26,10 +26,23 @@
 					/>
 				</uni-forms-item>
 				<uni-forms-item label="验证码" name="code">
-					<uni-easyinput
-						v-model="formData.code"
-						placeholder="请输入验证码"
-					/>
+					<view class="code-row">
+						<uni-easyinput
+							v-model="formData.code"
+							placeholder="请输入验证码"
+						/>
+						<button
+							:disabled="hasSent"
+							:type="!hasSent ? 'primary' : ''"
+							@click="sendCode('registerForm')"
+						>
+							{{
+								hasSent
+									? timeupSecond + '秒后重试'
+									: '获取验证码'
+							}}
+						</button>
+					</view>
 				</uni-forms-item>
 				<uni-forms-item label="新密码" name="password">
 					<uni-easyinput
@@ -38,10 +51,10 @@
 						placeholder="请输入新密码"
 					/>
 				</uni-forms-item>
-				<uni-forms-item label="确认密码" name="confirmPass">
+				<uni-forms-item label="确认密码" name="confirmPassword">
 					<uni-easyinput
 						type="password"
-						v-model="formData.confirmPass"
+						v-model="formData.confirmPassword"
 						placeholder="请再次输入密码"
 					/>
 				</uni-forms-item>
@@ -57,43 +70,61 @@
 </template>
 
 <script>
-import { email, verify, password, confirmPass } from '@/utils/verification.js'
+import {
+	email,
+	verify,
+	password,
+	confirmPassword
+} from '@/utils/verification.js'
+import { sendEmail, forgetCode } from '@/api/index.js'
 export default {
 	data() {
 		return {
 			formData: {
-				email: '',
+				email: '17766365691@168.com',
 				code: '',
 				password: '',
-				confirmPass: '',
+				confirmPassword: '',
 				uuid: ''
 			},
 			rules: {
 				email,
 				code: verify('验证码', 'input'),
 				password,
-				confirmPass
+				confirmPassword
 			},
-			codeUrl: ''
+			hasSent: false,
+			timeupSecond: 0
 		}
 	},
 	methods: {
+		sendCode(ref) {
+			this.$refs[ref].validateField(['email']).then(async data => {
+				const res = await sendEmail(data.email)
+				this.formData.uuid = res.msg
+				this.hasSent = true
+				this.timeupSecond = 60
+				const timer = setInterval(() => {
+					this.timeupSecond--
+					if (this.timeupSecond < 1) {
+						this.hasSent = false
+						clearInterval(timer)
+					}
+				}, 1000)
+			})
+		},
 		submitForm(ref) {
-			this.$refs[ref]
-				.validate()
-				.then(data => {
-					// if (res.code === 200) {
-					// 	uni.showToast({ title: res.msg })
-					// } else {
-					// 	uni.showToast({
-					// 		title: res.msg,
-					// 		icon: 'error'
-					// 	})
-					// }
-				})
-				.catch(err => {
-					console.log('err', err)
-				})
+			this.$refs[ref].validate().then(async data => {
+				const params = {
+					...this.formData,
+					newPassword: this.formData.password
+				}
+				delete params.password
+				const res = await forgetCode(params)
+				if (res.code === 200) {
+					uni.showToast({ title: '修改成功' })
+				}
+			})
 		}
 	}
 }
@@ -115,6 +146,22 @@ export default {
 
 /deep/ .uni-forms-item__label {
 	color: #333;
+}
+
+.code-row {
+	display: flex;
+
+	button {
+		height: 70rpx;
+		font-size: 28rpx;
+		margin-left: 20rpx;
+	}
+	button[type='primary'] {
+		background-image: linear-gradient(to right, #12aaff, #14e3f0);
+	}
+	button[disabled] {
+		color: hsla(0, 0%, 40%, 1);
+	}
 }
 
 .btn-row {

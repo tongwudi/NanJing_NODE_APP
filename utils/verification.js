@@ -73,7 +73,7 @@ module.exports = {
 			}
 		]
 	},
-	confirmPass: {
+	confirmPassword: {
 		rules: [
 			verify('确认密码'),
 			{

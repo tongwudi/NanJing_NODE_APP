@@ -57,10 +57,10 @@
 </template>
 
 <script>
+import { mapMutations, mapActions } from 'vuex'
 import { phonenumber, password, verify } from '@/utils/verification.js'
 import { captchaImage, appLogin } from '@/api/index.js'
 import { encrypt, decrypt } from '@/utils/rsa.js'
-import { mapMutations, mapActions } from 'vuex'
 export default {
 	data() {
 		return {
@@ -94,32 +94,21 @@ export default {
 			this.isRememberPwd = e.detail.value.length > 0
 		},
 		submitLogin(ref) {
-			this.$refs[ref]
-				.validate()
-				.then(async data => {
-					const params = {
-						...this.formData,
-						password: encrypt(this.formData.password)
-					}
-					const res = await appLogin(params)
+			this.$refs[ref].validate().then(async data => {
+				const params = {
+					...this.formData,
+					password: encrypt(this.formData.password)
+				}
+				const res = await appLogin(params)
+				if (res.code === 200) {
+					this.SET_TOKEN(res.token)
+					this.GetInfo()
 
-					if (res.code === 200) {
-						this.SET_TOKEN(res.token)
-						this.GetInfo()
-
-						uni.switchTab({ url: '/pages/home/index' })
-					} else {
-						this.getCodeUrl()
-
-						uni.showToast({
-							title: res.msg,
-							icon: 'error'
-						})
-					}
-				})
-				.catch(err => {
-					console.log('err', err)
-				})
+					uni.switchTab({ url: '/pages/home/index' })
+				} else {
+					this.getCodeUrl()
+				}
+			})
 		}
 	}
 }

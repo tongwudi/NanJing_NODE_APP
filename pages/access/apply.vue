@@ -70,11 +70,15 @@
 						</uni-forms-item>
 						<uni-forms-item label="实施时间" name="workTime">
 							<uni-datetime-picker
+								type="datetime"
+								v-model="formData.workTime"
+							/>
+							<!-- <uni-datetime-picker
 								type="datetimerange"
 								v-model="formData.workTime"
 								range-separator="至"
 								hide-second
-							/>
+							/> -->
 						</uni-forms-item>
 						<uni-forms-item label="所属项目" name="belongProject">
 							<uni-easyinput
@@ -112,11 +116,11 @@
 						</uni-forms-item>
 						<uni-forms-item class="upload" label="附件">
 							<uni-file-picker
-								limit="5"
 								file-mediatype="all"
-								v-model="files"
-								:list-styles="listStyles"
+								:value="files"
 								:auto-upload="false"
+								@select="selFile"
+								@delete="delFile"
 							>
 								<button>+ 上传文件</button>
 							</uni-file-picker>
@@ -235,13 +239,15 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { verify } from '@/utils/verification.js'
 import {
 	startApply,
 	getCounty,
 	getRoomByCounty,
 	getLeader,
-	getApplyType
+	getApplyType,
+	uploadFiles
 } from '@/api/index.js'
 export default {
 	data() {
@@ -260,16 +266,6 @@ export default {
 				belongMajor: verify('所属专业', 'input'),
 				workCompany: verify('施工单位', 'input'),
 				applyTypeId: verify('进出类型', 'select')
-				// workNote: verify('施工内容', 'input'),
-				// files: {
-				// 	rules: [
-				// 		{
-				// 			required: true,
-				// 			format: 'array',
-				// 			errorMessage: '附件不能为空'
-				// 		}
-				// 	]
-				// }
 			},
 			countyList: [],
 			roomList: [],
@@ -280,11 +276,7 @@ export default {
 		}
 	},
 	computed: {
-		listStyles() {
-			return {
-				border: false
-			}
-		}
+		...mapState(['token'])
 	},
 	filters: {
 		filterStatusText(index) {
@@ -309,6 +301,37 @@ export default {
 		])
 	},
 	methods: {
+		// 选择图片
+		selFile(file) {
+			// console.log(file)
+			if (!file.tempFilePaths.length) return
+
+			const promises = file.tempFilePaths.map(item => {
+				return uploadFiles(item)
+			})
+
+			Promise.all(promises).then(reslut => {
+				let res, url
+				reslut.forEach((item, index) => {
+					res = JSON.parse(item)
+					if (res.code === 200) {
+						const { name, extname } = file.tempFiles[index]
+						this.files.push({ name, extname, url: res.data[0] })
+					} else {
+						this.files.splice(index, 1)
+					}
+				})
+				// console.log(this.files)
+			})
+		},
+		// 删除图片
+		delFile(err) {
+			// console.log(err)
+			const num = this.files.findIndex(v => v.url === err.tempFilePath)
+			this.files.splice(num, 1)
+			// console.log(this.files)
+		},
+
 		renderStatusBgColor(index) {
 			if (index % 2 === 0) {
 				return 'status-2'
@@ -368,9 +391,6 @@ export default {
 				})
 			}
 		},
-		selectFile(e) {
-			console.log(e)
-		},
 		changeStaff(idx) {
 			if (idx === this.staffList.length - 1) {
 				this.staffList.push({})
@@ -379,27 +399,26 @@ export default {
 			}
 		},
 		submitForm(ref) {
-			this.$refs[ref]
-				.validate()
-				.then(async data => {
-					const params = {
-						enterRoomApplyDto: {
-							jyApplyEnterRoom: data,
-							jyApplyPeople: this.staffList
-						},
-						files: this.files
-					}
-					const res = await startApply(params)
-					console.log(res)
-				})
-				.catch(err => {
-					console.log('err', err)
-				})
+			this.$refs[ref].validate().then(async data => {
+				const files =
+					this.files?.map(item => {
+						return item.url
+					}) || []
+
+				const params = {
+					jyApplyEnterRoom: {
+						...data,
+						fileUrl: files.join(',')
+					},
+					jyApplyPeople: this.staffList
+				}
+				const res = await startApply(params)
+				console.log(res)
+			})
 		},
 		onPullDownRefresh() {
 			// 获取申请记录列表
 			setTimeout(() => {
-				console.log(111)
 				uni.stopPullDownRefresh()
 			}, 2000)
 		},
@@ -453,7 +472,6 @@ export default {
 	color: #2391ff;
 	background-color: #fff;
 }
-
 .status-1 {
 	background-image: linear-gradient(to right, #dbf2ff, #dafdff);
 }

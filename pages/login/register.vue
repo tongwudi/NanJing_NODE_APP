@@ -18,9 +18,9 @@
 				:model="formData"
 				:rules="rules"
 			>
-				<uni-forms-item label="姓名" name="name">
+				<uni-forms-item label="姓名" name="nickName">
 					<uni-easyinput
-						v-model="formData.name"
+						v-model="formData.nickName"
 						placeholder="请输入姓名"
 					/>
 				</uni-forms-item>
@@ -50,10 +50,10 @@
 						placeholder="请输入密码"
 					/>
 				</uni-forms-item>
-				<uni-forms-item label="确认密码" name="confirmPass">
+				<uni-forms-item label="确认密码" name="confirmPassword">
 					<uni-easyinput
 						type="password"
-						v-model="formData.confirmPass"
+						v-model="formData.confirmPassword"
 						placeholder="请再次输入密码"
 					/>
 				</uni-forms-item>
@@ -75,48 +75,38 @@ import {
 	idcard,
 	email,
 	password,
-	confirmPass
+	confirmPassword
 } from '@/utils/verification.js'
+import { appRegister } from '@/api/index.js'
 export default {
 	data() {
 		return {
 			formData: {
-				name: '',
-				phonenumber: '',
-				idcard: '',
-				email: '',
-				password: '',
-				confirmPass: '',
-				uuid: ''
+				nickName: '',
+				phonenumber: '15065014525',
+				idcard: '372923199409025319',
+				email: 'litong@33.cn',
+				password: '1234qwer',
+				confirmPassword: '1234qwer'
 			},
 			rules: {
-				name: verify('姓名', 'input'),
+				nickName: verify('姓名', 'input'),
 				phonenumber,
 				idcard,
 				email,
 				password,
-				confirmPass
-			},
-			codeUrl: ''
+				confirmPassword
+			}
 		}
 	},
 	methods: {
 		changePass(ref) {
-			this.$refs[ref]
-				.validate()
-				.then(async data => {
-					// if (res.code === 200) {
-					// 	uni.showToast({ title: res.msg })
-					// } else {
-					// 	uni.showToast({
-					// 		title: res.msg,
-					// 		icon: 'error'
-					// 	})
-					// }
-				})
-				.catch(err => {
-					console.log('err', err)
-				})
+			this.$refs[ref].validate().then(async data => {
+				const res = await appRegister(data)
+				if (res.code === 200) {
+					uni.showToast({ title: '注册成功' })
+				}
+			})
 		}
 	}
 }

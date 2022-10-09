@@ -7,8 +7,8 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
 	state: {
-		token: '',
-		roles: []
+		token: uni.getStorageSync('token'),
+		roles: uni.getStorageSync('roles')
 	},
 	mutations: {
 		SET_TOKEN(state, token) {
