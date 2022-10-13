@@ -81,7 +81,7 @@ export default {
 	data() {
 		return {
 			formData: {
-				email: '17766365691@168.com',
+				email: 'tongwudi@yeah.net',
 				code: '',
 				password: '',
 				confirmPassword: '',
@@ -100,21 +100,32 @@ export default {
 	methods: {
 		sendCode(ref) {
 			this.$refs[ref].validateField(['email']).then(async data => {
-				const res = await sendEmail(data.email)
-				this.formData.uuid = res.msg
-				this.hasSent = true
-				this.timeupSecond = 60
-				const timer = setInterval(() => {
-					this.timeupSecond--
-					if (this.timeupSecond < 1) {
-						this.hasSent = false
-						clearInterval(timer)
-					}
-				}, 1000)
+				uni.showLoading({
+					mask: true,
+					title: '加载中'
+				})
+				const res = await sendEmail({ email: data.email })
+				if (res.code === 200) {
+					uni.showToast({ title: '验证码已发送' })
+					this.formData.uuid = res.msg
+					this.hasSent = true
+					this.timeupSecond = 60
+					const timer = setInterval(() => {
+						this.timeupSecond--
+						if (this.timeupSecond < 1) {
+							this.hasSent = false
+							clearInterval(timer)
+						}
+					}, 1000)
+				}
 			})
 		},
 		submitForm(ref) {
 			this.$refs[ref].validate().then(async data => {
+				uni.showLoading({
+					mask: true,
+					title: '加载中'
+				})
 				const params = {
 					...this.formData,
 					newPassword: this.formData.password

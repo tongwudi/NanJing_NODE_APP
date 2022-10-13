@@ -18,7 +18,8 @@ class Request {
 			}
 		}
 	}
-	async get(url, config = {}) {
+	async get(url, data = {}) {
+		const config = { data }
 		return this._request('get', url, config);
 	}
 	async post(url, data = {}) {
@@ -197,10 +198,6 @@ global.$request.setConfig({
 })
 // 设置请求拦截器
 global.$request.interceptors.request(config => {
-	uni.showLoading({
-		title: '加载中',
-		mask: true
-	})
 	// 配置参数和全局配置相同，此优先级最高，会覆盖在其他地方的相同配置参数
 
 	// 追加请求头，推荐
@@ -221,29 +218,30 @@ global.$request.interceptors.request(config => {
 // 设置响应拦截器
 global.$request.interceptors.response(res => {
 	// 接收请求，执行响应操作
-	uni.hideLoading()
 	if (res.statusCode == 200) {
 		const { code, msg } = res.data
-
-		if (code === 401) {
+		if (code === 200) {
+			return res.data
+		} else if (code === 401) {
 			uni.showToast({
 				title: '请重新登录',
 				icon: 'error',
-				duration: 3000
+				duration: 2000
 			})
+			return res.data
 		} else {
 			uni.showToast({
 				title: msg,
 				icon: 'error',
-				duration: 3000
+				duration: 2000
 			})
+			return res.data
 		}
-		return res.data
 	} else {
 		uni.showToast({
 			title: '请求失败',
 			icon: 'error',
-			duration: 3000
+			duration: 2000
 		})
 	}
 	// 您的逻辑......

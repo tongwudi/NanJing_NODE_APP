@@ -37,7 +37,10 @@ export default {
 			// 允许从相机和相册扫码
 			uni.scanCode({
 				success: res => {
-					uni.navigateTo({ url: '' })
+					if (res.result) {
+						const result = JSON.parse(res.result)
+						uni.navigateTo({ url: '/pages/access/clock?roomId='+ result.roomId })
+					}
 					console.log('条码类型：' + res.scanType)
 					console.log('条码内容：' + res.result)
 				}

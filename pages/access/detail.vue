@@ -11,51 +11,47 @@
 				<view class="card-content__body">
 					<view>
 						<text>行政区域</text>
-						<text class="bold">建邺区</text>
+						<text class="bold">{{ info.roomCounty }}</text>
 					</view>
 					<view>
 						<text>机房名称</text>
-						<text class="bold">南京建邺区国家广告产业园C座301</text>
+						<text class="bold">{{ info.roomName }}</text>
 					</view>
 					<view>
 						<text>申请单位</text>
-						<text class="bold">建邺分公司</text>
+						<text class="bold">{{ info.applyCompany }}</text>
 					</view>
 					<view>
 						<text>项目经理</text>
-						<text class="bold">王大</text>
+						<text class="bold">{{ info.proManagerName }}</text>
 					</view>
 					<view>
 						<text>申请时间</text>
-						<text class="bold">2022/07/19</text>
+						<text class="bold">{{ info.applyTime }}</text>
 					</view>
 					<view>
 						<text>实施时间</text>
-						<text class="bold">2022/07/20 08:00~2022/07/2</text>
+						<text class="bold">{{ info.workTime }}</text>
 					</view>
 					<view>
 						<text>所属项目</text>
-						<text class="bold">南京机房智能运维支撑平台</text>
+						<text class="bold">{{ info.belongProject }}</text>
 					</view>
 					<view>
 						<text>所属专业</text>
-						<text class="bold">传输</text>
+						<text class="bold">{{ info.belongMajor }}</text>
 					</view>
 					<view>
 						<text>施工单位</text>
-						<text class="bold">XXX</text>
+						<text class="bold">{{ info.workCompany }}</text>
 					</view>
 					<view>
 						<text>进出类型</text>
-						<text class="bold">巡检勘察</text>
+						<text class="bold">{{ info.applyTypeName }}</text>
 					</view>
 					<view>
 						<text>施工内容</text>
-						<text class="wrap bold">
-							将空调换个位置将空调换个位
-							将空调换个位置将空调换个位
-							将空调换个位置将空调换个位 将空调换个位置
-						</text>
+						<text class="wrap bold">{{ info.workNote }}</text>
 					</view>
 					<view>
 						<text>附件</text>
@@ -67,7 +63,7 @@
 			<view class="staff-list">
 				<m-card
 					class="staff"
-					v-for="index in 3"
+					v-for="(item, index) in staffList"
 					:key="index"
 					:title="'进出人员' + index"
 					:padding="25"
@@ -75,15 +71,15 @@
 					<view class="card-content__body">
 						<view>
 							<text>姓名</text>
-							<text class="bold">王五</text>
+							<text class="bold">{{ item.applyName }}</text>
 						</view>
 						<view>
 							<text>联系电话</text>
-							<text class="bold">15005148799</text>
+							<text class="bold">{{ item.applyContract }}</text>
 						</view>
 						<view>
 							<text>身份号码</text>
-							<text class="bold">326459458745254568</text>
+							<text class="bold">{{ item.applyIdCard }}</text>
 						</view>
 					</view>
 				</m-card>
@@ -91,20 +87,29 @@
 
 			<m-card class="timeline" title="流程" :padding="25">
 				<view class="card-content__body">
-					<view class="timeline-item" v-for="index in 3" :key="index">
+					<view
+						class="timeline-item"
+						v-for="(item, index) in processList"
+						:key="index"
+					>
 						<view class="item-info">
 							<view class="applicant-name">
 								<image src="/static/logo.png"></image>
 								<view class="flx-clm">
-									<text>申请人</text>
-									<text>张三</text>
+									<text>{{ item.nodeName }}</text>
+									<text>{{ item.assigneeName }}</text>
 								</view>
 							</view>
 							<view class="applicant-status flx-clm">
-								<text :class="[renderStatusColor(index)]">
-									{{ index | filterStatusText }}
-								</text>
-								<text>2022/07/27 14:00</text>
+								<template v-if="item.approveTime">
+									<!-- <text :class="[renderStatusColor(index)]">
+										{{ index | filterStatusText }}
+									</text> -->
+									<text>{{ item.nodeName }}</text>
+									<uni-dateformat :date="item.approveTime"></uni-dateformat>
+									<!-- <text>{{ item.approveTime }}</text> -->
+								</template>
+								<text v-else class="unapproved">未开始</text>
 							</view>
 						</view>
 						<view class="item-line"></view>
@@ -112,35 +117,35 @@
 				</view>
 			</m-card>
 
-			<m-card class="code" title="验证码" :padding="25">
+			<m-card class="code" title="验证码" :padding="25" v-if="JSON.stringify(authCode) != '{}'">
 				<view class="card-content__body">
 					<view class="code-item">
 						<text>验证码</text>
-						<text class="bold">234578</text>
+						<text class="bold">{{ authCode.authCode }}</text>
 					</view>
 					<view class="code-item">
 						<text>验证码状态</text>
 						<text
 							class="code-status"
-							:class="[renderStatusColor(2)]"
+							:class="[renderCodeStatusBgColor(authCode.value)]"
 						>
-							{{ 2 | filterStatusText }}
+							{{ authCode.status }}
 						</text>
 					</view>
 				</view>
 			</m-card>
-
-			<view class="btn-row">
+			<!-- 访客离开 -->
+			<view class="btn-row" v-if="roles.includes('admin') && processStatus === '访客离开'">
+				<button type="primary" @click="clockOut">离开打卡</button>
+			</view>
+			<!-- 项目经理/网格员审核 -->
+			<view class="btn-row" v-else-if="(processStatus === '项目经理审批' || processStatus === '网络员审批') && !roles.includes('admin')">
 				<button type="warn" @click="rejectClick">驳回</button>
 				<button type="primary" @click="passClick">通过</button>
 			</view>
-			<view class="btn-row">
-				<button type="info">取消</button>
-				<button type="primary">已办</button>
-			</view>
-			<view class="btn-row">
-				<button type="info">取消</button>
-				<button type="primary">已确认</button>
+			<!-- 代维已办/代维已确认 -->
+			<view class="btn-row" v-else-if="(processStatus === '代维已办' || processStatus === '代维已确认') && !roles.includes('admin')">
+				<button type="primary" @click="passClick">确认</button>
 			</view>
 		</view>
 
@@ -166,53 +171,112 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import { viewTask, completeTask } from '@/api/index.js'
 export default {
 	data() {
 		return {
-			popupText: ''
+			processInstanceId: '',
+			popupText: '',
+			info: {},
+			staffList: [],
+			processList: [],
+			taskId: '',
+			processStatus: '',
+			authCode: {}
 		}
 	},
-	filters: {
-		filterStatusText(index) {
-			if (index % 2 === 0) {
-				return '待激活'
-			} else if (index % 3 === 0) {
-				return '已激活'
-			} else if (index % 5 === 0) {
-				return '已打卡'
-			} else if (index % 7 === 0) {
-				return '已失效'
-			} else {
-				return '待审批'
-			}
-		}
+	computed: {
+		...mapState(['roles'])
+	},
+	async onLoad(params) {
+		this.processInstanceId = params.id
+
+		uni.showLoading({
+			mask: true,
+			title: '加载中'
+		})
+		await this.getDetail()
+		uni.hideLoading()
 	},
 	methods: {
-		renderStatusColor(index) {
-			if (index % 2 === 0) {
-				return 'status-2'
-			} else if (index % 3 === 0) {
-				return 'status-3'
-			} else if (index % 5 === 0) {
-				return 'status-4'
-			} else if (index % 7 === 0) {
-				return 'status-5'
+		renderCodeStatusBgColor(index) {
+			if (index == 1) {
+				return 'status-yjh'
+			} else if (index == 2) {
+				return 'status-ysx'
 			} else {
-				return 'status-1'
+				return 'status-djh'
+			}
+		},
+		async getDetail() {
+			const params = {
+				processInstanceId: this.processInstanceId
+			}
+			const res = await viewTask(params)
+			const { data, code } = res
+			if (code === 200) {
+				this.info = data.applyEnterRoomEntity
+				this.staffList = data.jyApplyPeople
+				this.processList = data.task.userList
+				this.taskId = data.task.taskId
+				this.processStatus = data.task.approveProcess
+				this.authCode = data.authCode || {}
 			}
 		},
 		passClick() {
 			this.popupText = '确认通过审批？'
 			this.$refs.popup.open()
 		},
-		dialogConfirm(value) {
-			this.$refs.popup.close()
+		clockOut() {
+			this.popupText = '确定打卡离开吗？'
+			this.$refs.popup.open()
+		},
+		async dialogConfirm() {
+			uni.showLoading({
+				mask: true,
+				title: '加载中'
+			})
+			const params = {
+				taskId: this.taskId,
+				status: 'yes' // 审批状态(yes-通过 no-驳回)
+			}
+			const res = await completeTask(params)
+			if (res.code === 200) {
+				this.$refs.popup.close()
+				uni.showToast({
+					title: '操作成功',
+					icon: 'success'
+				})
+				this.getDetail()
+			}
 		},
 		rejectClick() {
 			this.$refs.inputDialog.open()
 		},
-		dialogInputConfirm(value) {
-			this.$refs.inputDialog.close()
+		async dialogInputConfirm(value) {
+			if (value === '') {
+				uni.showToast({ title: '驳回原因不能为空' })
+				return
+			}
+			uni.showLoading({
+				mask: true,
+				title: '加载中'
+			})
+			const params = {
+				comment: value,
+				taskId: this.taskId,
+				status: 'no' // 审批状态(yes-通过 no-驳回)
+			}
+			const res = await completeTask(params)
+			if (res.code === 200) {
+				this.$refs.inputDialog.close()
+				uni.showToast({
+					title: '数据已驳回',
+					icon: 'success'
+				})
+				this.getDetail()
+			}
 		}
 	}
 }
@@ -260,10 +324,10 @@ export default {
 		.flx-clm {
 			display: flex;
 			flex-direction: column;
+			color: #666;
 			text {
 				line-height: 40rpx;
 				font-size: 24rpx;
-				color: #666;
 			}
 		}
 	}
@@ -299,21 +363,7 @@ export default {
 	}
 }
 
-.status-1 {
-	background-image: linear-gradient(to right, #dbf2ff, #dafdff);
-}
-.status-2 {
-	background-image: linear-gradient(to right, #ffebcd, #feffbb);
-}
-.status-3 {
-	background-image: linear-gradient(to right, #cbffec, #caffc1);
-}
-.status-4 {
-	// background-image: linear-gradient(to right, #dbf2ff, #dafdff);
-	color: #fff;
-	background-color: forestgreen;
-}
-.status-5 {
-	background-image: linear-gradient(to right, #dfe4e8, #e8f8f9);
+.unapproved {
+	color: #ff8a00;
 }
 </style>

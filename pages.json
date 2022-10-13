@@ -34,7 +34,8 @@
 		{
 			"path": "pages/access/approval",
 			"style": {
-				"navigationBarTitleText": "进出机房审批"
+				"navigationBarTitleText": "进出机房审批",
+				"enablePullDownRefresh" : true
 			}
 		},
 		{
@@ -80,14 +81,14 @@
 				"iconPath": "static/img/access.png",
 				"selectedIconPath": "static/img/accessHL.png",
 				"text": "进出机房",
-				"visible": false
+				"visible": true
 			},
 			{
 				"pagePath": "pages/access/approval",
 				"iconPath": "static/img/access.png",
 				"selectedIconPath": "static/img/accessHL.png",
 				"text": "进出机房",
-				"visible": false
+				"visible": true
 			},
 			{
 				"pagePath": "pages/mine/index",

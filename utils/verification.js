@@ -48,10 +48,6 @@ module.exports = {
 				format: 'email',
 				errorMessage: '邮箱格式不正确，请重新填写'
 			}
-			// {
-			// 	pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
-			// 	errorMessage: '邮箱格式不正确，请重新填写'
-			// }
 		]
 	},
 	password: {
@@ -59,14 +55,13 @@ module.exports = {
 			verify('密码'),
 			{
 				validateFunction: (rule, value, data, callback) => {
-					const reg =
-						/(?!.*\s)(?!^[\u4e00-\u9fa5]+$)(?!^[0-9]+$)(?!^[A-z]+$)(?!^[^A-z0-9]+$)^.{8,20}$/
-					if (value.length < 8) {
+					const reg = /(?!.*\s)(?!^[\u4e00-\u9fa5]+$)(?!^[0-9]+$)(?!^[A-z]+$)(?!^[^A-z0-9]+$)^.{8,20}$/
+					if (!reg.test(value)) {
+						callback('数字、字母和特殊字符(除空格外)至少包含两种')
+					} else if (value.length < 8) {
 						callback('密码不能少于8位')
 					} else if (value.length > 20) {
 						callback('密码不能超过20位')
-					} else if (!reg.test(value)) {
-						callback('数字、字母和特殊字符(除空格外)至少包含两种')
 					}
 					return true
 				}

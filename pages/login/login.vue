@@ -37,7 +37,11 @@
 			<view class="settings-row">
 				<checkbox-group @change="changeRemember">
 					<label>
-						<checkbox value="1" style="transform: scale(0.75)" />
+						<checkbox
+							value="1"
+							:checked="isRememberPwd"
+							style="transform: scale(0.75)"
+						/>
 						<text>记住密码</text>
 					</label>
 				</checkbox-group>
@@ -65,8 +69,12 @@ export default {
 	data() {
 		return {
 			formData: {
-				phonenumber: '15888888888',
-				password: 'admin123',
+				phonenumber: '',
+				password: '',
+				// phonenumber: '15888888888', // 若依-申请人
+				// phonenumber: '18168935982', // 项目经理1
+				// phonenumber: '17766365691', // 阚庆武-网格员
+				// password: 'admin123',
 				code: '',
 				uuid: ''
 			},
@@ -76,35 +84,57 @@ export default {
 				code: verify('验证码', 'input')
 			},
 			codeUrl: '',
-			isRememberPwd: false
+			isRememberPwd: true
 		}
 	},
 	onLoad() {
+		const phonenumber = uni.getStorageSync('phonenumber')
+		const password = uni.getStorageSync('password')
+		if (phonenumber && password) {
+			this.formData.phonenumber = phonenumber
+			this.formData.password = password
+			this.isRememberPwd = true
+		}
 		this.getCodeUrl()
+		this.$store.dispatch('Logout')
 	},
 	methods: {
 		...mapMutations(['SET_TOKEN']),
 		...mapActions(['GetInfo']),
 		async getCodeUrl() {
-			const { img, uuid } = await captchaImage()
-			this.codeUrl = 'data:image/gif;base64,' + img
-			this.formData.uuid = uuid
+			const { code, img, uuid } = await captchaImage()
+			if (code === 200) {
+				this.codeUrl = 'data:image/gif;base64,' + img
+				this.formData.uuid = uuid
+			}
 		},
 		changeRemember(e) {
 			this.isRememberPwd = e.detail.value.length > 0
 		},
 		submitLogin(ref) {
 			this.$refs[ref].validate().then(async data => {
+				uni.showLoading({
+					mask: true,
+					title: '加载中'
+				})
 				const params = {
 					...this.formData,
 					password: encrypt(this.formData.password)
 				}
 				const res = await appLogin(params)
 				if (res.code === 200) {
+					if (this.isRememberPwd) {
+						const { phonenumber, password } = this.formData
+						uni.setStorageSync('phonenumber', phonenumber)
+						uni.setStorageSync('password', password)
+					} else {
+						uni.removeStorageSync('phonenumber')
+						uni.removeStorageSync('password')
+					}
 					this.SET_TOKEN(res.token)
-					this.GetInfo()
-
-					uni.switchTab({ url: '/pages/home/index' })
+					this.GetInfo().then(() => {
+						uni.switchTab({ url: '/pages/home/index' })
+					})
 				} else {
 					this.getCodeUrl()
 				}

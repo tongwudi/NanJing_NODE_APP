@@ -98,10 +98,10 @@
 								placeholder="请输入"
 							/>
 						</uni-forms-item>
-						<uni-forms-item label="进出类型" name="applyTypeId">
+						<uni-forms-item label="进出类型" name="applyType">
 							<uni-data-picker
 								popup-title="请选择进出类型"
-								v-model="formData.applyTypeId"
+								v-model="formData.applyType"
 								:clear-icon="false"
 								:localdata="applyTypeList"
 							></uni-data-picker>
@@ -114,17 +114,16 @@
 								placeholder="请输入"
 							/>
 						</uni-forms-item>
-						<uni-forms-item class="upload" label="附件">
+						<!-- <uni-forms-item class="upload" label="附件">
 							<uni-file-picker
-								file-mediatype="all"
-								:value="files"
+								mode="list"
 								:auto-upload="false"
 								@select="selFile"
 								@delete="delFile"
 							>
-								<button>+ 上传文件</button>
+								<button>+ 上传</button>
 							</uni-file-picker>
-						</uni-forms-item>
+						</uni-forms-item> -->
 					</view>
 				</m-card>
 
@@ -169,60 +168,66 @@
 							</uni-forms-item>
 						</view>
 					</m-card>
+				</view>
 
-					<view class="btn-row">
-						<button type="primary" @click="submitForm('applyForm')">
-							提交
-						</button>
-					</view>
+				<view class="btn-row">
+					<button type="primary" @click="submitForm('applyForm')">
+						提交
+					</button>
 				</view>
 			</uni-forms>
 		</view>
 
 		<view class="content" v-show="tabIndex === 1">
-			<m-card
-				v-for="index in 8"
-				:key="index"
-				@tapClick="viewDetail(index)"
-			>
-				<template v-slot:other>
-					<view
-						class="card-status"
-						:class="[renderStatusBgColor(index)]"
-					>
-						{{ index | filterStatusText }}
+			<template v-if="applyList.length > 0">
+				<m-card
+					v-for="(item, index) in applyList"
+					:key="index"
+					@tapClick="viewDetail(item.processInstanceId)"
+				>
+					<template v-slot:other>
+						<view
+							class="card-status"
+							:class="[
+								'authCodeDto' in item
+									? renderCodeStatusBgColor(item.authCodeDto.status)
+									: renderStatusBgColor(item.processStatus)
+							]"
+						>
+							{{ ('authCodeDto' in item && item.authCodeDto.status) || renderStatusText(item.processStatus) }}
+						</view>
+						<button
+							class="cancel-btn"
+							v-if="('authCodeDto' in item && item.authCodeDto.status === '0') || item.processStatus === '0'"
+							@click.stop="revoke"
+						>
+							撤销
+						</button>
+					</template>
+					<view class="card-content__body">
+						<view>
+							<text>进出类型</text>
+							<text>{{ item.applyTypeName }}</text>
+						</view>
+						<view>
+							<text>所属项目</text>
+							<text>{{ item.belongProject }}</text>
+						</view>
+						<view v-if="item.authCodeDto">
+							<text>验证码</text>
+							<text class="bold">
+								{{ item.authCodeDto.authCode }}
+							</text>
+						</view>
+						<view v-else>
+							<text>申请时间</text>
+							<text>{{ item.applyTime }}</text>
+						</view>
 					</view>
-					<button
-						class="cancel-btn"
-						v-if="
-							index % 2 === 0 ||
-								index % 3 === 0 ||
-								index % 7 === 0
-						"
-						@click.stop="revoke"
-					>
-						撤销
-					</button>
-				</template>
-				<view class="card-content__body">
-					<view>
-						<text>进出类型</text>
-						<text>巡检勘察</text>
-					</view>
-					<view>
-						<text>所属项目</text>
-						<text>南京机房智能运维支撑平台</text>
-					</view>
-					<view v-if="index % 3 === 0">
-						<text>验证码</text>
-						<text class="bold">245879</text>
-					</view>
-					<view v-else>
-						<text>申请时间</text>
-						<text>2022/09/16 15:20</text>
-					</view>
-				</view>
-			</m-card>
+				</m-card>
+				<uni-load-more :status="loadStatus"></uni-load-more>
+			</template>
+			<view v-else class="no-data">暂无数据</view>
 		</view>
 
 		<uni-popup ref="popup" type="dialog">
@@ -239,15 +244,15 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import { verify } from '@/utils/verification.js'
 import {
+	uploadFiles,
 	startApply,
 	getCounty,
 	getRoomByCounty,
 	getLeader,
 	getApplyType,
-	uploadFiles
+	getApplyList
 } from '@/api/index.js'
 export default {
 	data() {
@@ -258,91 +263,98 @@ export default {
 			rules: {
 				county: verify('行政区域', 'select'),
 				roomId: verify('机房名称', 'select'),
-				applyCompany: verify('项目经理', 'input'),
-				proManagerId: verify('申请单位', 'select'),
+				applyCompany: verify('申请单位', 'input'),
+				proManagerId: verify('项目经理', 'select'),
 				applyTime: verify('申请时间', 'input'),
 				workTime: verify('实施时间', 'input'),
 				belongProject: verify('所属项目', 'input'),
 				belongMajor: verify('所属专业', 'input'),
 				workCompany: verify('施工单位', 'input'),
-				applyTypeId: verify('进出类型', 'select')
+				applyType: verify('进出类型', 'select')
 			},
+			// files: [],
 			countyList: [],
 			roomList: [],
 			leaderList: [],
 			applyTypeList: [],
 			staffList: [{}],
-			files: []
-		}
-	},
-	computed: {
-		...mapState(['token'])
-	},
-	filters: {
-		filterStatusText(index) {
-			if (index % 2 === 0) {
-				return '待激活'
-			} else if (index % 3 === 0) {
-				return '已激活'
-			} else if (index % 5 === 0) {
-				return '已打卡'
-			} else if (index % 7 === 0) {
-				return '已失效'
-			} else {
-				return '待审批'
-			}
+			loadStatus: '',
+			isLoadMore: false,
+			pageNum: 1,
+			pageSize: 10,
+			applyList: []
 		}
 	},
 	onLoad() {
+		getApp().globalData.reviseTabbar()
+
+		uni.showLoading({
+			mask: true,
+			title: '加载中'
+		})
 		Promise.all([
 			this.getCountyList(),
 			this.getLeaderList(),
 			this.getApplyTypeList()
-		])
+		]).then(() => {
+			uni.hideLoading()
+		})
 	},
 	methods: {
-		// 选择图片
-		selFile(file) {
-			// console.log(file)
-			if (!file.tempFilePaths.length) return
-
-			const promises = file.tempFilePaths.map(item => {
-				return uploadFiles(item)
-			})
-
-			Promise.all(promises).then(reslut => {
-				let res, url
-				reslut.forEach((item, index) => {
-					res = JSON.parse(item)
-					if (res.code === 200) {
-						const { name, extname } = file.tempFiles[index]
-						this.files.push({ name, extname, url: res.data[0] })
-					} else {
-						this.files.splice(index, 1)
-					}
-				})
-				// console.log(this.files)
-			})
-		},
-		// 删除图片
-		delFile(err) {
-			// console.log(err)
-			const num = this.files.findIndex(v => v.url === err.tempFilePath)
-			this.files.splice(num, 1)
-			// console.log(this.files)
-		},
-
-		renderStatusBgColor(index) {
-			if (index % 2 === 0) {
-				return 'status-2'
-			} else if (index % 3 === 0) {
-				return 'status-3'
-			} else if (index % 5 === 0) {
-				return 'status-4'
-			} else if (index % 7 === 0) {
-				return 'status-5'
+		renderStatusText(index) {
+			if (index == 1) {
+				return '已通过'
+			} else if (index == 2) {
+				return '已驳回'
 			} else {
-				return 'status-1'
+				return '审核中'
+			}
+		},
+		renderStatusBgColor(index) {
+			if (index == 1) {
+				return 'status-resolve'
+			} else if (index == 2) {
+				return 'status-reject'
+			} else {
+				return 'status-pending'
+			}
+		},
+		renderCodeStatusBgColor(index) {
+			if (index == 1) {
+				return 'status-yjh'
+			} else if (index == 2) {
+				return 'status-ysx'
+			} else {
+				return 'status-djh'
+			}
+		},
+		onPullDownRefresh() {
+			if (this.tabIndex === 1) {
+				this.pageNum = 1
+				this.applyList = []
+				this.getApplyRecord()
+			} else {
+				this.formData = {}
+				// this.files = []
+				this.staffList = [{}]
+			}
+			uni.stopPullDownRefresh()
+		},
+		onReachBottom() {
+			if (this.tabIndex === 0) return
+			if (this.isLoadMore) return
+
+			this.pageNum += 1
+			this.getApplyRecord()
+		},
+		changeTab(index) {
+			if (this.tabIndex === index) return
+			this.tabIndex = index
+
+			if (index === 1) {
+				this.pageNum = 1
+				this.applyList = []
+				this.getApplyRecord()
 			}
 		},
 		async getCountyList() {
@@ -361,7 +373,7 @@ export default {
 			this.$delete(this.formData, 'roomId')
 
 			const { value: county } = e.detail.value[0]
-			const res = await getRoomByCounty(county)
+			const res = await getRoomByCounty({ county })
 			this.roomList = res.data.map(item => {
 				return {
 					text: item.roomName,
@@ -391,6 +403,54 @@ export default {
 				})
 			}
 		},
+		async getApplyRecord() {
+			uni.showLoading({
+				mask: true,
+				title: '加载中'
+			})
+			this.loadStatus = 'loading'
+			const params = { pageNum: this.pageNum, pageSize: this.pageSize }
+			const res = await getApplyList(params)
+			if (res.code === 200) {
+				uni.hideLoading()
+				this.applyList = this.applyList.concat(res.rows)
+				if (this.applyList.length === res.total) {
+					this.isLoadMore = true
+					this.loadStatus = 'nomore'
+				} else {
+					this.isLoadMore = false
+					this.loadStatus = 'more'
+				}
+			}
+		},
+		// // 选择文件
+		// selFile(file) {
+		// 	// console.log(file)
+		// 	if (!file.tempFilePaths.length) return
+		// 	const promises = file.tempFilePaths.map(item => {
+		// 		return uploadFiles(item)
+		// 	})
+		// 	Promise.all(promises).then(reslut => {
+		// 		let res, url
+		// 		reslut.forEach((item, index) => {
+		// 			res = JSON.parse(item)
+		// 			if (res.code === 200) {
+		// 				const { name, extname } = file.tempFiles[index]
+		// 				this.files.push({ name, extname, url: res.data[0] })
+		// 			} else {
+		// 				this.files.splice(index, 1)
+		// 			}
+		// 		})
+		// 		// console.log(this.files)
+		// 	})
+		// },
+		// // 删除文件
+		// delFile(err) {
+		// 	// console.log(err)
+		// 	const num = this.files.findIndex(v => v.url === err.tempFilePath)
+		// 	this.files.splice(num, 1)
+		// 	// console.log(this.files)
+		// },
 		changeStaff(idx) {
 			if (idx === this.staffList.length - 1) {
 				this.staffList.push({})
@@ -399,39 +459,37 @@ export default {
 			}
 		},
 		submitForm(ref) {
+			uni.showLoading({
+				mask: true,
+				title: '加载中'
+			})
 			this.$refs[ref].validate().then(async data => {
-				const files =
-					this.files?.map(item => {
-						return item.url
-					}) || []
+				// const files =
+				// 	this.files?.map(item => {
+				// 		return item.url
+				// 	}) || []
 
 				const params = {
 					jyApplyEnterRoom: {
-						...data,
-						fileUrl: files.join(',')
+						// fileUrl: files.join(','),
+						...data
 					},
 					jyApplyPeople: this.staffList
 				}
 				const res = await startApply(params)
-				console.log(res)
+				if (res.code === 200) {
+					this.formData = {}
+					// this.files = []
+					this.staffList = [{}]
+					uni.showToast({
+						title: '申请成功',
+						icon: 'success'
+					})
+				}
 			})
 		},
-		onPullDownRefresh() {
-			// 获取申请记录列表
-			setTimeout(() => {
-				uni.stopPullDownRefresh()
-			}, 2000)
-		},
-		changeTab(index) {
-			if (this.tabIndex === index) return
-			this.tabIndex = index
-		},
-		viewDetail(index) {
-			if (index % 3 === 0 || index % 5 === 0) {
-				uni.navigateTo({ url: './clock' })
-			} else {
-				uni.navigateTo({ url: './detail' })
-			}
+		viewDetail(id) {
+			uni.navigateTo({ url: './detail?id=' + id })
 		},
 		revoke() {
 			this.$refs.popup.open()
@@ -471,22 +529,5 @@ export default {
 	font-size: 28rpx;
 	color: #2391ff;
 	background-color: #fff;
-}
-.status-1 {
-	background-image: linear-gradient(to right, #dbf2ff, #dafdff);
-}
-.status-2 {
-	background-image: linear-gradient(to right, #ffebcd, #feffbb);
-}
-.status-3 {
-	background-image: linear-gradient(to right, #cbffec, #caffc1);
-}
-.status-4 {
-	// background-image: linear-gradient(to right, #dbf2ff, #dafdff);
-	color: #fff;
-	background-color: forestgreen;
-}
-.status-5 {
-	background-image: linear-gradient(to right, #dfe4e8, #e8f8f9);
 }
 </style>

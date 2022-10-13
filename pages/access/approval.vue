@@ -5,7 +5,7 @@
 		<image class="bg-top" src="@/static/img/bg-top.png"></image>
 
 		<view class="nav">
-			<m-nav title="进出机房审批" right-icon="scan"></m-nav>
+			<m-nav title="进出机房审批"></m-nav>
 
 			<view class="tabs">
 				<view
@@ -27,7 +27,7 @@
 					placeholder="请选择进出类型"
 					v-model="applyType"
 					:clear-icon="false"
-					:readonly="isChecked"
+					:readonly="applyList.length === 0 || isChecked"
 					:localdata="applyTypeList"
 					@change="changeApplyType"
 				></uni-data-picker>
@@ -40,45 +40,70 @@
 			</view>
 
 			<checkbox-group @change="checkedChange">
-				<uni-row class="swipe-box" v-for="index in 8" :key="index">
-					<uni-col :span="isChecked ? 21 : 24">
-						<m-card @tapClick="viewDetail">
-							<view class="card-content__body">
-								<view class="applicant">
-									<image src="@/static/logo.png"></image>
+				<template v-if="applyList.length > 0">
+					<uni-row
+						class="swipe-box"
+						v-for="(item, index) in applyList"
+						:key="index"
+					>
+						<uni-col :span="isChecked ? 21 : 24">
+							<m-card
+								@tapClick="
+									viewDetail(
+										item.jyApplyEnterRoom.processInstanceId
+									)
+								"
+							>
+								<view class="card-content__body">
+									<view class="applicant">
+										<image src="@/static/logo.png"></image>
+										<view>
+											<text>申请人</text>
+											<text>{{ item.jyApplyEnterRoom.applyUserName }}</text>
+										</view>
+									</view>
 									<view>
-										<text>申请人</text>
-										<text>张三</text>
+										<text>进出类型</text>
+										<text>{{ item.jyApplyEnterRoom.applyTypeName }}</text>
+									</view>
+									<view>
+										<text>申请时间</text>
+										<text>{{ item.jyApplyEnterRoom.applyTime }}</text>
 									</view>
 								</view>
-								<view>
-									<text>进出类型</text>
-									<text>巡检勘察</text>
-								</view>
-								<view>
-									<text>申请时间</text>
-									<text>2022/09/16 15:20</text>
-								</view>
-							</view>
-						</m-card>
-					</uni-col>
-					<uni-col class="swipe-box_right" :span="isChecked ? 3 : 0">
-						<checkbox :value="index + ''" />
-					</uni-col>
-				</uni-row>
+							</m-card>
+						</uni-col>
+						<uni-col
+							class="swipe-box_right"
+							:span="isChecked ? 3 : 0"
+						>
+							<checkbox :value="index + ''" />
+						</uni-col>
+					</uni-row>
+					<uni-load-more :status="loadStatus"></uni-load-more>
+				</template>
+				<view v-else class="no-data">暂无数据</view>
 			</checkbox-group>
 		</view>
 
 		<view class="content" v-show="tabIndex === 1">
-			<m-card v-for="index in 8" :key="index" @tapClick="viewDetail">
+			<m-card
+				v-for="(item, index) in approvedList"
+				:key="index"
+				@tapClick="viewDetail(item.jyApplyEnterRoom.processInstanceId)"
+			>
 				<template v-slot:other>
 					<view
 						class="card-status"
-						:class="[renderStatusBgColor(index)]"
+						:class="[renderStatusBgColor(item.jyApplyEnterRoom.processStatus)]"
 					>
-						{{ index | filterStatusText }}
+						{{ item.jyApplyEnterRoom.processStatus | filterStatusText }}
 					</view>
-					<button class="cancel-btn" @click.stop="revoke">
+					<button
+						class="cancel-btn"
+						v-if="item.jyApplyEnterRoom.processStatus === '0'"
+						@click.stop="revoke"
+					>
 						撤销
 					</button>
 				</template>
@@ -88,16 +113,16 @@
 						<image src="../../static/logo.png"></image>
 						<view class="">
 							<text>申请人</text>
-							<text>张三</text>
+							<text>{{ item.jyApplyEnterRoom.applyUserName }}</text>
 						</view>
 					</view>
 					<view>
 						<text>进出类型</text>
-						<text>巡检勘察</text>
+						<text>{{ item.jyApplyEnterRoom.applyTypeName }}</text>
 					</view>
 					<view>
 						<text>申请时间</text>
-						<text>2022/09/16 15:20</text>
+						<text>{{ item.jyApplyEnterRoom.applyTime }}</text>
 					</view>
 				</view>
 			</m-card>
@@ -116,7 +141,7 @@
 </template>
 
 <script>
-import { getApplyType, searchTodo } from '@/api/index.js'
+import { getApplyType, searchTodo, getApprovedRecord } from '@/api/index.js'
 export default {
 	data() {
 		return {
@@ -126,28 +151,91 @@ export default {
 			applyType: '',
 			isChecked: false,
 			batchIds: [],
-			pageNum: 1
+			loadStatus: '',
+			isLoadMore: false,
+			pageNum: 1,
+			pageSize: 10,
+			applyList: [],
+			approvedList: []
 		}
 	},
 	filters: {
 		filterStatusText(index) {
-			if (index % 2 === 0) {
+			if (index == 1) {
 				return '已通过'
-			} else {
+			} else if (index == 2) {
 				return '已驳回'
+			} else {
+				return '审核中'
 			}
 		}
 	},
 	onLoad() {
-		Promise.all([/*this.getList(), */ this.getApplyTypeList()])
+		getApp().globalData.reviseTabbar()
+
+		uni.showLoading({
+			mask: true,
+			title: '加载中'
+		})
+		Promise.all([this.getList(), this.getApplyTypeList()]).then(() => {
+			uni.hideLoading()
+		})
 	},
 	methods: {
 		renderStatusBgColor(index) {
-			if (index % 2 === 0) {
-				return 'status-pass'
-			} else {
+			if (index == 1) {
+				return 'status-resolve'
+			} else if (index == 2) {
 				return 'status-reject'
+			} else {
+				return 'status-pending'
 			}
+		},
+		async onPullDownRefresh() {
+			uni.showLoading({
+				mask: true,
+				title: '加载中'
+			})
+			this.pageNum = 1
+			if (this.tabIndex === 0) {
+				this.applyType = ''
+				this.applyList = []
+				await this.getList()
+			} else {
+				await this.getApprovedList()
+			}
+			uni.hideLoading()
+			uni.stopPullDownRefresh()
+		},
+		async onReachBottom() {
+			if (this.tabIndex === 1) return
+			if (this.isLoadMore) return
+			uni.showLoading({
+				mask: true,
+				title: '加载中'
+			})
+
+			this.pageNum += 1
+			await this.getList()
+			uni.hideLoading()
+		},
+		async changeTab(index) {
+			if (this.tabIndex === index) return
+			this.tabIndex = index
+
+			uni.showLoading({
+				mask: true,
+				title: '加载中'
+			})
+			this.pageNum = 1
+			if (index === 0) {
+				this.applyType = ''
+				this.applyList = []
+				await this.getList()
+			} else {
+				await this.getApprovedList()
+			}
+			uni.hideLoading()
 		},
 		async getApplyTypeList() {
 			const { code, data } = await getApplyType()
@@ -163,20 +251,41 @@ export default {
 		changeApplyType(e) {
 			const { value } = e.detail.value[0]
 			this.applyType = value
-			// this.getList()
+			this.getList()
 		},
 		async getList() {
+			this.loadStatus = 'loading'
+			this.isChecked = false
+			this.batchIds = []
 			const params = {
 				applyType: this.applyType,
 				pageNum: this.pageNum
 			}
 			const res = await searchTodo(params)
-			console.log(res)
+			if (res.code === 200) {
+				this.applyList = this.applyList.concat(res.rows)
+				if (this.applyList.length === res.total) {
+					this.isLoadMore = true
+					this.loadStatus = 'nomore'
+				} else {
+					this.isLoadMore = false
+					this.loadStatus = 'more'
+				}
+			}
 		},
-		changeTab(index) {
-			this.tabIndex = index
+		async getApprovedList() {
+			uni.showLoading({
+				mask: true,
+				title: '加载中'
+			})
+			const res = await getApprovedRecord()
+			if (res.code === 200) {
+				uni.hideLoading()
+				this.approvedList = res.rows
+			}
 		},
 		batchClick() {
+			if (this.applyList.length === 0) return
 			if (this.isChecked && this.batchIds.length > 0) {
 				// 提交批量审批，重新加载数据列表，清空已选中
 				// for(let key of approval) {
@@ -190,8 +299,8 @@ export default {
 			const values = e.detail.value
 			this.batchIds = values
 		},
-		viewDetail() {
-			uni.navigateTo({ url: './detail' })
+		viewDetail(id) {
+			uni.navigateTo({ url: './detail?id=' + id })
 		},
 		revoke() {
 			this.$refs.popup.open()
@@ -204,13 +313,6 @@ export default {
 </script>
 
 <style lang="scss">
-.status-pass {
-	background-image: linear-gradient(to right, #8ff0f0, #7cd0ff);
-}
-.status-reject {
-	background-image: linear-gradient(to right, #ffcea1, #ffa5a5);
-}
-
 .select-row {
 	display: flex;
 	margin: 20rpx;
@@ -218,6 +320,9 @@ export default {
 		.input-value-border {
 			border: 1px solid #b1daff;
 			background: #fff;
+		}
+		.placeholder {
+			font-size: 24rpx !important;
 		}
 		.input-value {
 			height: 72rpx;
@@ -241,7 +346,6 @@ export default {
 		}
 	}
 }
-
 .swipe-box {
 	display: flex;
 	align-items: center;

@@ -96,6 +96,12 @@
 	}
 }
 
+.no-data {
+	margin-top: 120rpx;
+	text-align: center;
+	color: #999;
+}
+
 .card-status {
 	position: absolute;
 	right: 0;
@@ -107,6 +113,31 @@
 	border-bottom-left-radius: 12rpx;
 	border-top-right-radius: 12rpx;
 	color: #434a4d;
+}
+
+// 待激活
+.status-djh {
+	background-image: linear-gradient(to right, #ffebcd, #feffbb);
+}
+// 已激活
+.status-yjh {
+	background-image: linear-gradient(to right, #cbffec, #caffc1);
+}
+// 已失效
+.status-ysx {
+	background-image: linear-gradient(to right, #dfe4e8, #e8f8f9);
+}
+// 审核中
+.status-pending {
+	background-image: linear-gradient(to right, #87d4ff, #95f8fe);
+}
+// 已通过
+.status-resolve {
+	background-image: linear-gradient(to right, #dbf2ff, #dafdff);
+}
+//已驳回
+.status-reject {
+	background-image: linear-gradient(to right, #ffa5a5, #ffcea1);
 }
 
 .btn-row {

@@ -1,12 +1,23 @@
 <script>
 export default {
+	globalData: {
+		reviseTabbar() {
+			const roles = uni.getStorageSync('roles') || []
+			if (roles.includes('admin')) {
+				uni.setTabBarItem({
+					index: 2,
+					visible: false
+				})
+			} else {
+				uni.setTabBarItem({
+					index: 1,
+					visible: false
+				})
+			}
+		}
+	},
 	onLaunch: function() {
 		console.log('App Launch')
-
-		let token = uni.getStorageSync('token')
-		uni.redirectTo({
-			url: token ? 'pages/home/index' : 'pages/login/login'
-		})
 	},
 	onShow: function() {
 		console.log('App Show')

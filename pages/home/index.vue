@@ -7,12 +7,8 @@ export default {
 	data() {
 		return {}
 	},
-	onLoad() {
-		let roles = uni.getStorageSync('roles')
-		uni.setTabBarItem({
-			index: !roles?.includes('admin') ? 2 : 1,
-			visible: true
-		})
+	onShow() {
+		getApp().globalData.reviseTabbar()
 	},
 	methods: {}
 }

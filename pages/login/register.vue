@@ -102,6 +102,10 @@ export default {
 	methods: {
 		changePass(ref) {
 			this.$refs[ref].validate().then(async data => {
+				uni.showLoading({
+					mask: true,
+					title: '加载中'
+				})
 				const res = await appRegister(data)
 				if (res.code === 200) {
 					uni.showToast({ title: '注册成功' })

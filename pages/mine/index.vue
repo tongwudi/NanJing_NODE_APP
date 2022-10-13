@@ -7,12 +7,12 @@
 		<view class="mx10">
 			<m-card padding="60px 0 10px 0">
 				<image class="avatar" src="@/static/img/avatar.png"></image>
-				<view class="h1">Hi, 张三</view>
+				<view class="h1">Hi, {{ userInfo.nickName }}</view>
 				<uni-title
 					type="h3"
 					align="center"
 					color="#666"
-					title="15005148799"
+					:title="userInfo.phonenumber"
 				></uni-title>
 			</m-card>
 
@@ -47,10 +47,21 @@
 				</uni-list-item>
 			</uni-list>
 		</view>
+
+		<uni-popup ref="popup" type="dialog">
+			<uni-popup-dialog
+				type="info"
+				cancelText="取消"
+				confirmText="确定"
+				content="确定要退出登录吗？"
+				@confirm="dialogConfirm"
+			></uni-popup-dialog>
+		</uni-popup>
 	</view>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import mCard from '../../components/m-card.vue'
 export default {
 	components: { mCard },
@@ -60,12 +71,27 @@ export default {
 				color: '#6BE2CD',
 				size: '24',
 				type: 'locked-filled'
-			}
+			},
+			userInfo: {}
 		}
 	},
+	onLoad() {
+		getApp().globalData.reviseTabbar()
+
+		const { nickName, phonenumber } = uni.getStorageSync('userInfo')
+		this.userInfo = { nickName, phonenumber }
+	},
 	methods: {
+		...mapActions(['Logout']),
 		logout() {
-			uni.clearStorageSync()
+			this.$refs.popup.open()
+		},
+		dialogConfirm(value) {
+			this.$refs.popup.close()
+			this.Logout()
+			uni.reLaunch({
+				url: '/pages/login/login'
+			})
 		}
 	}
 }
