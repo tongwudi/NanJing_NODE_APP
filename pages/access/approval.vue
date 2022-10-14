@@ -141,6 +141,7 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 import { getApplyType, searchTodo, getApprovedRecord } from '@/api/index.js'
 export default {
 	data() {
@@ -171,8 +172,6 @@ export default {
 		}
 	},
 	onLoad() {
-		getApp().globalData.reviseTabbar()
-
 		uni.showLoading({
 			mask: true,
 			title: '加载中'
@@ -181,7 +180,11 @@ export default {
 			uni.hideLoading()
 		})
 	},
+	onShow() {
+		this.REVISE_TABBAR()
+	},
 	methods: {
+		...mapMutations(['REVISE_TABBAR']),
 		renderStatusBgColor(index) {
 			if (index == 1) {
 				return 'status-resolve'

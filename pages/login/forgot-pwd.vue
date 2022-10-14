@@ -81,7 +81,7 @@ export default {
 	data() {
 		return {
 			formData: {
-				email: 'tongwudi@yeah.net',
+				email: '',
 				code: '',
 				password: '',
 				confirmPassword: '',

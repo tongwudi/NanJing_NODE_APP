@@ -37,6 +37,19 @@ const store = new Vuex.Store({
 		CLEAR_USERINFO(state) {
 			state.userInfo = {}
 			uni.removeStorageSync('userInfo')
+		},
+		REVISE_TABBAR(state) {
+			if (state.roles.includes('admin')) {
+				uni.setTabBarItem({
+					index: 2,
+					visible: false
+				})
+			} else {
+				uni.setTabBarItem({
+					index: 1,
+					visible: false
+				})
+			}
 		}
 	},
 	actions: {

@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapMutations, mapActions } from 'vuex'
 import mCard from '../../components/m-card.vue'
 export default {
 	components: { mCard },
@@ -76,12 +76,14 @@ export default {
 		}
 	},
 	onLoad() {
-		getApp().globalData.reviseTabbar()
-
 		const { nickName, phonenumber } = uni.getStorageSync('userInfo')
 		this.userInfo = { nickName, phonenumber }
 	},
+	onShow() {
+		this.REVISE_TABBAR()
+	},
 	methods: {
+		...mapMutations(['REVISE_TABBAR']),
 		...mapActions(['Logout']),
 		logout() {
 			this.$refs.popup.open()

@@ -3,14 +3,17 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 export default {
 	data() {
 		return {}
 	},
 	onShow() {
-		getApp().globalData.reviseTabbar()
+		this.REVISE_TABBAR()
 	},
-	methods: {}
+	methods: {
+		...mapMutations(['REVISE_TABBAR'])
+	}
 }
 </script>
 

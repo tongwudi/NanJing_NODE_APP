@@ -62,6 +62,7 @@ class Request {
 				name: 'files',
 				timeout: 20000, // 超时时间 20s
 				async complete(response) {
+					response.data = JSON.parse(response.data)
 					let res = response
 					if (_this.resInterceptors && typeof _this.resInterceptors === 'function') {
 						let resInterceptors = _this.resInterceptors(res);

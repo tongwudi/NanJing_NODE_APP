@@ -114,16 +114,17 @@
 								placeholder="请输入"
 							/>
 						</uni-forms-item>
-						<!-- <uni-forms-item class="upload" label="附件">
+						<uni-forms-item class="upload" label="附件">
 							<uni-file-picker
 								mode="list"
+								:value="files"
 								:auto-upload="false"
 								@select="selFile"
 								@delete="delFile"
 							>
 								<button>+ 上传</button>
 							</uni-file-picker>
-						</uni-forms-item> -->
+						</uni-forms-item>
 					</view>
 				</m-card>
 
@@ -190,15 +191,25 @@
 							class="card-status"
 							:class="[
 								'authCodeDto' in item
-									? renderCodeStatusBgColor(item.authCodeDto.status)
+									? renderCodeStatusBgColor(
+											item.authCodeDto.value
+									  )
 									: renderStatusBgColor(item.processStatus)
 							]"
 						>
-							{{ ('authCodeDto' in item && item.authCodeDto.status) || renderStatusText(item.processStatus) }}
+							{{
+								('authCodeDto' in item &&
+									item.authCodeDto.status) ||
+									renderStatusText(item.processStatus)
+							}}
 						</view>
 						<button
 							class="cancel-btn"
-							v-if="('authCodeDto' in item && item.authCodeDto.status === '0') || item.processStatus === '0'"
+							v-if="
+								('authCodeDto' in item &&
+									item.authCodeDto.status === '0') ||
+									item.processStatus === '0'
+							"
 							@click.stop="revoke"
 						>
 							撤销
@@ -244,6 +255,7 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 import { verify } from '@/utils/verification.js'
 import {
 	uploadFiles,
@@ -272,7 +284,7 @@ export default {
 				workCompany: verify('施工单位', 'input'),
 				applyType: verify('进出类型', 'select')
 			},
-			// files: [],
+			files: [],
 			countyList: [],
 			roomList: [],
 			leaderList: [],
@@ -286,8 +298,6 @@ export default {
 		}
 	},
 	onLoad() {
-		getApp().globalData.reviseTabbar()
-
 		uni.showLoading({
 			mask: true,
 			title: '加载中'
@@ -300,7 +310,11 @@ export default {
 			uni.hideLoading()
 		})
 	},
+	onShow() {
+		this.REVISE_TABBAR()
+	},
 	methods: {
+		...mapMutations(['REVISE_TABBAR']),
 		renderStatusText(index) {
 			if (index == 1) {
 				return '已通过'
@@ -335,7 +349,7 @@ export default {
 				this.getApplyRecord()
 			} else {
 				this.formData = {}
-				// this.files = []
+				this.files = []
 				this.staffList = [{}]
 			}
 			uni.stopPullDownRefresh()
@@ -369,17 +383,25 @@ export default {
 			}
 		},
 		async getRoomList(e) {
+			uni.showLoading({
+				mask: true,
+				title: '加载中'
+			})
+
 			this.roomList = []
 			this.$delete(this.formData, 'roomId')
 
 			const { value: county } = e.detail.value[0]
 			const res = await getRoomByCounty({ county })
-			this.roomList = res.data.map(item => {
-				return {
-					text: item.roomName,
-					value: item.roomId
-				}
-			})
+			if (res.code === 200) {
+				uni.hideLoading()
+				this.roomList = res.data.map(item => {
+					return {
+						text: item.roomName,
+						value: item.roomId
+					}
+				})
+			}
 		},
 		async getLeaderList() {
 			const { code, data } = await getLeader()
@@ -423,34 +445,32 @@ export default {
 				}
 			}
 		},
-		// // 选择文件
-		// selFile(file) {
-		// 	// console.log(file)
-		// 	if (!file.tempFilePaths.length) return
-		// 	const promises = file.tempFilePaths.map(item => {
-		// 		return uploadFiles(item)
-		// 	})
-		// 	Promise.all(promises).then(reslut => {
-		// 		let res, url
-		// 		reslut.forEach((item, index) => {
-		// 			res = JSON.parse(item)
-		// 			if (res.code === 200) {
-		// 				const { name, extname } = file.tempFiles[index]
-		// 				this.files.push({ name, extname, url: res.data[0] })
-		// 			} else {
-		// 				this.files.splice(index, 1)
-		// 			}
-		// 		})
-		// 		// console.log(this.files)
-		// 	})
-		// },
-		// // 删除文件
-		// delFile(err) {
-		// 	// console.log(err)
-		// 	const num = this.files.findIndex(v => v.url === err.tempFilePath)
-		// 	this.files.splice(num, 1)
-		// 	// console.log(this.files)
-		// },
+		// 选择文件
+		selFile(file) {
+			// console.log(file)
+			if (!file.tempFilePaths.length) return
+			const promises = file.tempFilePaths.map(item => {
+				return uploadFiles(item)
+			})
+			Promise.all(promises).then(reslut => {
+				reslut.forEach((res, index) => {
+					if (res.code === 200) {
+						const { fileName, fileUrl } = res.data[0]
+						this.files.push({ name: fileName, url: fileUrl, fileName, fileUrl })
+					} else {
+						this.files.splice(index, 1)
+					}
+				})
+				// console.log(this.files)
+			})
+		},
+		// 删除文件
+		delFile(err) {
+			// console.log(err)
+			const num = this.files.findIndex(v => v.url === err.tempFilePath)
+			this.files.splice(num, 1)
+			// console.log(this.files)
+		},
 		changeStaff(idx) {
 			if (idx === this.staffList.length - 1) {
 				this.staffList.push({})
@@ -464,22 +484,19 @@ export default {
 				title: '加载中'
 			})
 			this.$refs[ref].validate().then(async data => {
-				// const files =
-				// 	this.files?.map(item => {
-				// 		return item.url
-				// 	}) || []
-
+				const files = this.files?.map(item => {
+					const { fileName, fileUrl } = item
+					return { fileName, fileUrl }
+				}) || []
 				const params = {
-					jyApplyEnterRoom: {
-						// fileUrl: files.join(','),
-						...data
-					},
+					jyApplyEnterRoom: this.formData,
+					jyApplyFiles: files,
 					jyApplyPeople: this.staffList
 				}
 				const res = await startApply(params)
 				if (res.code === 200) {
 					this.formData = {}
-					// this.files = []
+					this.files = []
 					this.staffList = [{}]
 					uni.showToast({
 						title: '申请成功',

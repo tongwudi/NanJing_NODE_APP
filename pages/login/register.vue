@@ -83,11 +83,11 @@ export default {
 		return {
 			formData: {
 				nickName: '',
-				phonenumber: '15065014525',
-				idcard: '372923199409025319',
-				email: 'litong@33.cn',
-				password: '1234qwer',
-				confirmPassword: '1234qwer'
+				phonenumber: '',
+				idcard: '',
+				email: '',
+				password: '',
+				confirmPassword: ''
 			},
 			rules: {
 				nickName: verify('姓名', 'input'),

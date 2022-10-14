@@ -53,9 +53,11 @@
 						<text>施工内容</text>
 						<text class="wrap bold">{{ info.workNote }}</text>
 					</view>
-					<view>
+					<view v-if="files.length > 0">
 						<text>附件</text>
-						<text>XXX</text>
+						<view class="annex-list">
+							<text v-for="item in files">{{ item.fileName }}</text>
+						</view>
 					</view>
 				</view>
 			</m-card>
@@ -179,6 +181,7 @@ export default {
 			processInstanceId: '',
 			popupText: '',
 			info: {},
+			files: [],
 			staffList: [],
 			processList: [],
 			taskId: '',
@@ -217,6 +220,7 @@ export default {
 			const { data, code } = res
 			if (code === 200) {
 				this.info = data.applyEnterRoomEntity
+				this.files = data.jyApplyFiles
 				this.staffList = data.jyApplyPeople
 				this.processList = data.task.userList
 				this.taskId = data.task.taskId
@@ -365,5 +369,16 @@ export default {
 
 .unapproved {
 	color: #ff8a00;
+}
+
+.annex-list {
+	display: flex;
+	flex-direction: column;
+	line-height: 40rpx;
+	color: #2391FF;
+
+	text:not(:first-child) {
+		margin-top: 18rpx;
+	}
 }
 </style>
