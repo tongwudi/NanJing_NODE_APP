@@ -139,11 +139,7 @@
 							<uni-icons
 								class="fr"
 								size="20"
-								:type="
-									index === staffList.length - 1
-										? 'plus'
-										: 'minus'
-								"
+								:type="index === staffList.length - 1 ? 'plus' : 'minus'"
 								@click="changeStaff(index)"
 							></uni-icons>
 						</template>
@@ -191,16 +187,14 @@
 							class="card-status"
 							:class="[
 								'authCodeDto' in item
-									? renderCodeStatusBgColor(
-											item.authCodeDto.value
-									  )
+									? renderCodeStatusBgColor(item.authCodeDto.value)
 									: renderStatusBgColor(item.processStatus)
 							]"
 						>
 							{{
-								('authCodeDto' in item &&
-									item.authCodeDto.status) ||
-									renderStatusText(item.processStatus)
+								'authCodeDto' in item
+									? item.authCodeDto.status
+									: renderStatusText(item.processStatus)
 							}}
 						</view>
 						<button
@@ -210,7 +204,7 @@
 									item.authCodeDto.status === '0') ||
 									item.processStatus === '0'
 							"
-							@click.stop="revoke"
+							@click.stop="revoke(item.processInstanceId)"
 						>
 							撤销
 						</button>
@@ -248,23 +242,24 @@
 				confirmText="确定"
 				content="确认撤销申请？"
 				@confirm="dialogConfirm"
-				@close="dialogClose"
 			></uni-popup-dialog>
 		</uni-popup>
+		
+		<m-tabbar />
 	</view>
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
-import { verify } from '@/utils/verification.js'
+import { verify } from '@/utils/validate.js'
 import {
-	uploadFiles,
-	startApply,
 	getCounty,
 	getRoomByCounty,
 	getLeader,
+	uploadFiles,
+	startApply,
 	getApplyType,
-	getApplyList
+	getApplyList,
+	recallTask
 } from '@/api/index.js'
 export default {
 	data() {
@@ -294,7 +289,8 @@ export default {
 			isLoadMore: false,
 			pageNum: 1,
 			pageSize: 10,
-			applyList: []
+			applyList: [],
+			processInstanceId: ''
 		}
 	},
 	onLoad() {
@@ -310,16 +306,14 @@ export default {
 			uni.hideLoading()
 		})
 	},
-	onShow() {
-		this.REVISE_TABBAR()
-	},
 	methods: {
-		...mapMutations(['REVISE_TABBAR']),
 		renderStatusText(index) {
 			if (index == 1) {
 				return '已通过'
 			} else if (index == 2) {
 				return '已驳回'
+			} else if (index == 3) {
+				return '已撤销'
 			} else {
 				return '审核中'
 			}
@@ -329,6 +323,8 @@ export default {
 				return 'status-resolve'
 			} else if (index == 2) {
 				return 'status-reject'
+			} else if (index == 3) {
+				return 'status-ycx'
 			} else {
 				return 'status-pending'
 			}
@@ -484,6 +480,14 @@ export default {
 				title: '加载中'
 			})
 			this.$refs[ref].validate().then(async data => {
+				const verifyStaff = this.staffList.some(item => !item.applyName || !item.applyContract || !item.applyIdCard)
+				if (verifyStaff) {
+					uni.showToast({
+						title: '请完善进出人员信息',
+						icon: 'none'
+					})
+					return
+				}
 				const files = this.files?.map(item => {
 					const { fileName, fileUrl } = item
 					return { fileName, fileUrl }
@@ -508,14 +512,24 @@ export default {
 		viewDetail(id) {
 			uni.navigateTo({ url: './detail?id=' + id })
 		},
-		revoke() {
+		revoke(processInstanceId) {
+			this.processInstanceId = processInstanceId
 			this.$refs.popup.open()
 		},
-		dialogConfirm(value) {
-			this.$refs.popup.close()
-		},
-		dialogClose() {
-			this.$refs.popup.close()
+		async dialogConfirm() {
+			uni.showLoading({
+				mask: true,
+				title: '加载中'
+			})
+			const res = await recallTask({ processInstanceId: this.processInstanceId })
+			if (res.code === 200) {
+				this.$refs.popup.close()
+				uni.showToast({
+					title: '数据已驳回',
+					icon: 'success'
+				})
+				this.renderCodeStatusBgColor(3)
+			}
 		}
 	}
 }
@@ -536,6 +550,19 @@ export default {
 	}
 	.files__name {
 		color: #2391ff;
+	}
+	.files-button {
+		button {
+			line-height: 72rpx !important;
+		}
+	}
+	.uni-forms-item__label {
+		height: 72rpx !important;
+	}
+	.uni-date__x-input,
+	.uni-easyinput__content-input,
+	.input-value {
+		height: 70rpx !important;
 	}
 }
 // .uniui-calendar {

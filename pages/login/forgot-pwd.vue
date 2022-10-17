@@ -75,7 +75,7 @@ import {
 	verify,
 	password,
 	confirmPassword
-} from '@/utils/verification.js'
+} from '@/utils/validate.js'
 import { sendEmail, forgetCode } from '@/api/index.js'
 export default {
 	data() {

@@ -90,18 +90,18 @@
 			<m-card
 				v-for="(item, index) in approvedList"
 				:key="index"
-				@tapClick="viewDetail(item.jyApplyEnterRoom.processInstanceId)"
+				@tapClick="viewDetail(item.processInstanceId)"
 			>
 				<template v-slot:other>
 					<view
 						class="card-status"
-						:class="[renderStatusBgColor(item.jyApplyEnterRoom.processStatus)]"
+						:class="[renderStatusBgColor(item.processStatus)]"
 					>
-						{{ item.jyApplyEnterRoom.processStatus | filterStatusText }}
+						{{ item.processStatus | filterStatusText }}
 					</view>
 					<button
 						class="cancel-btn"
-						v-if="item.jyApplyEnterRoom.processStatus === '0'"
+						v-if="item.processStatus === '0'"
 						@click.stop="revoke"
 					>
 						撤销
@@ -113,16 +113,16 @@
 						<image src="../../static/logo.png"></image>
 						<view class="">
 							<text>申请人</text>
-							<text>{{ item.jyApplyEnterRoom.applyUserName }}</text>
+							<text>{{ item.applyUserName }}</text>
 						</view>
 					</view>
 					<view>
 						<text>进出类型</text>
-						<text>{{ item.jyApplyEnterRoom.applyTypeName }}</text>
+						<text>{{ item.applyTypeName }}</text>
 					</view>
 					<view>
 						<text>申请时间</text>
-						<text>{{ item.jyApplyEnterRoom.applyTime }}</text>
+						<text>{{ item.applyTime }}</text>
 					</view>
 				</view>
 			</m-card>
@@ -137,11 +137,12 @@
 				@confirm="dialogConfirm"
 			></uni-popup-dialog>
 		</uni-popup>
+		
+		<m-tabbar />
 	</view>
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
 import { getApplyType, searchTodo, getApprovedRecord } from '@/api/index.js'
 export default {
 	data() {
@@ -166,6 +167,8 @@ export default {
 				return '已通过'
 			} else if (index == 2) {
 				return '已驳回'
+			} else if (index == 3) {
+				return '已撤销'
 			} else {
 				return '审核中'
 			}
@@ -180,16 +183,14 @@ export default {
 			uni.hideLoading()
 		})
 	},
-	onShow() {
-		this.REVISE_TABBAR()
-	},
 	methods: {
-		...mapMutations(['REVISE_TABBAR']),
 		renderStatusBgColor(index) {
 			if (index == 1) {
 				return 'status-resolve'
 			} else if (index == 2) {
 				return 'status-reject'
+			} else if (index == 3) {
+				return 'status-ycx'
 			} else {
 				return 'status-pending'
 			}
@@ -284,7 +285,9 @@ export default {
 			const res = await getApprovedRecord()
 			if (res.code === 200) {
 				uni.hideLoading()
-				this.approvedList = res.rows
+				this.approvedList = res.rows.map(item => {
+					return item.jyApplyEnterRoom
+				})
 			}
 		},
 		batchClick() {

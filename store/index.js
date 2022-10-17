@@ -11,7 +11,8 @@ const store = new Vuex.Store({
 	state: {
 		token: uni.getStorageSync('token'),
 		roles: uni.getStorageSync('roles') || [],
-		userInfo: uni.getStorageSync('userInfo') || {}
+		userInfo: uni.getStorageSync('userInfo') || {},
+		tabbarIdx: uni.getStorageSync('tabbarIdx') || 0
 	},
 	mutations: {
 		SET_TOKEN(state, token) {
@@ -26,6 +27,10 @@ const store = new Vuex.Store({
 			state.userInfo = userInfo || {}
 			uni.setStorageSync('userInfo', userInfo)
 		},
+		SET_TABBARIDX(state, idx) {
+			state.tabbarIdx = idx
+			uni.setStorageSync('tabbarIdx', idx)
+		},
 		CLEAR_TOKEN(state) {
 			state.token = ''
 			uni.removeStorageSync('token')
@@ -38,19 +43,10 @@ const store = new Vuex.Store({
 			state.userInfo = {}
 			uni.removeStorageSync('userInfo')
 		},
-		REVISE_TABBAR(state) {
-			if (state.roles.includes('admin')) {
-				uni.setTabBarItem({
-					index: 2,
-					visible: false
-				})
-			} else {
-				uni.setTabBarItem({
-					index: 1,
-					visible: false
-				})
-			}
-		}
+		CLEAR_TABBARIDX(state) {
+			state.tabbarIdx = 0
+			uni.removeStorageSync('tabbarIdx')
+		},
 	},
 	actions: {
 		async GetInfo(ctx) {
@@ -64,6 +60,7 @@ const store = new Vuex.Store({
 			ctx.commit('CLEAR_TOKEN')
 			ctx.commit('CLEAR_ROLES')
 			ctx.commit('CLEAR_USERINFO')
+			ctx.commit('CLEAR_TABBARIDX')
 		}
 	}
 })

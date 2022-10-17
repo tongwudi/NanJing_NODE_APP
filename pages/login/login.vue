@@ -62,7 +62,7 @@
 
 <script>
 import { mapMutations, mapActions } from 'vuex'
-import { phonenumber, password, verify } from '@/utils/verification.js'
+import { phonenumber, password, verify } from '@/utils/validate.js'
 import { captchaImage, appLogin } from '@/api/index.js'
 import { encrypt, decrypt } from '@/utils/rsa.js'
 export default {
@@ -123,6 +123,7 @@ export default {
 				}
 				const res = await appLogin(params)
 				if (res.code === 200) {
+					uni.hideLoading()
 					if (this.isRememberPwd) {
 						const { phonenumber, password } = this.formData
 						uni.setStorageSync('phonenumber', phonenumber)
@@ -132,9 +133,8 @@ export default {
 						uni.removeStorageSync('password')
 					}
 					this.SET_TOKEN(res.token)
-					this.GetInfo().then(() => {
-						uni.switchTab({ url: '/pages/home/index' })
-					})
+					this.GetInfo()
+					uni.redirectTo({ url: '/pages/home/index' })
 				} else {
 					this.getCodeUrl()
 				}

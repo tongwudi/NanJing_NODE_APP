@@ -28,6 +28,8 @@ export const verifyCode = data => http.get('/enter/room/enterVerify', data)
 export const getVisitInfo = data => http.get('/enter/room/visitInfo', data)
 // 任务审批
 export const completeTask = data => http.post('/enter/room/completeTask', data)
+// 撤销
+export const recallTask = data => http.get('/enter/room/recallTask', data)
 // 审批记录列表
 export const getApprovedRecord = data => http.post('/enter/room/doneList', data)
 // 获取行政区域

@@ -76,7 +76,7 @@ import {
 	email,
 	password,
 	confirmPassword
-} from '@/utils/verification.js'
+} from '@/utils/validate.js'
 import { appRegister } from '@/api/index.js'
 export default {
 	data() {

@@ -57,11 +57,13 @@
 				@confirm="dialogConfirm"
 			></uni-popup-dialog>
 		</uni-popup>
+		
+		<m-tabbar />
 	</view>
 </template>
 
 <script>
-import { mapMutations, mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 import mCard from '../../components/m-card.vue'
 export default {
 	components: { mCard },
@@ -79,11 +81,7 @@ export default {
 		const { nickName, phonenumber } = uni.getStorageSync('userInfo')
 		this.userInfo = { nickName, phonenumber }
 	},
-	onShow() {
-		this.REVISE_TABBAR()
-	},
 	methods: {
-		...mapMutations(['REVISE_TABBAR']),
 		...mapActions(['Logout']),
 		logout() {
 			this.$refs.popup.open()

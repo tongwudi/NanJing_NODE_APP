@@ -56,18 +56,20 @@
 					<view v-if="files.length > 0">
 						<text>附件</text>
 						<view class="annex-list">
-							<text v-for="item in files">{{ item.fileName }}</text>
+							<text v-for="item in files">
+								{{ item.fileName }}
+							</text>
 						</view>
 					</view>
 				</view>
 			</m-card>
 
-			<view class="staff-list">
+			<view class="staff-list" v-if="staffList.length > 0">
 				<m-card
 					class="staff"
 					v-for="(item, index) in staffList"
 					:key="index"
-					:title="'进出人员' + index"
+					:title="'进出人员' + (index + 1)"
 					:padding="25"
 				>
 					<view class="card-content__body">
@@ -87,7 +89,12 @@
 				</m-card>
 			</view>
 
-			<m-card class="timeline" title="流程" :padding="25">
+			<m-card
+				class="timeline"
+				title="流程"
+				:padding="25"
+				v-if="processList.length > 0"
+			>
 				<view class="card-content__body">
 					<view
 						class="timeline-item"
@@ -104,12 +111,8 @@
 							</view>
 							<view class="applicant-status flx-clm">
 								<template v-if="item.approveTime">
-									<!-- <text :class="[renderStatusColor(index)]">
-										{{ index | filterStatusText }}
-									</text> -->
 									<text>{{ item.nodeName }}</text>
 									<uni-dateformat :date="item.approveTime"></uni-dateformat>
-									<!-- <text>{{ item.approveTime }}</text> -->
 								</template>
 								<text v-else class="unapproved">未开始</text>
 							</view>
@@ -119,7 +122,12 @@
 				</view>
 			</m-card>
 
-			<m-card class="code" title="验证码" :padding="25" v-if="JSON.stringify(authCode) != '{}'">
+			<m-card
+				class="code"
+				title="验证码"
+				:padding="25"
+				v-if="JSON.stringify(authCode) != '{}'"
+			>
 				<view class="card-content__body">
 					<view class="code-item">
 						<text>验证码</text>
@@ -137,16 +145,33 @@
 				</view>
 			</m-card>
 			<!-- 访客离开 -->
-			<view class="btn-row" v-if="roles.includes('admin') && processStatus === '访客离开'">
+			<view
+				class="btn-row"
+				v-if="roles.includes('admin') && processStatus === '访客离开'"
+			>
 				<button type="primary" @click="clockOut">离开打卡</button>
 			</view>
 			<!-- 项目经理/网格员审核 -->
-			<view class="btn-row" v-else-if="(processStatus === '项目经理审批' || processStatus === '网络员审批') && !roles.includes('admin')">
+			<view
+				class="btn-row"
+				v-else-if="
+					(processStatus === '项目经理审批' ||
+						processStatus === '网络员审批') &&
+						!roles.includes('admin')
+				"
+			>
 				<button type="warn" @click="rejectClick">驳回</button>
 				<button type="primary" @click="passClick">通过</button>
 			</view>
 			<!-- 代维已办/代维已确认 -->
-			<view class="btn-row" v-else-if="(processStatus === '代维已办' || processStatus === '代维已确认') && !roles.includes('admin')">
+			<view
+				class="btn-row"
+				v-else-if="
+					(processStatus === '代维已办' ||
+						processStatus === '代维已确认') &&
+						!roles.includes('admin')
+				"
+			>
 				<button type="primary" @click="passClick">确认</button>
 			</view>
 		</view>
@@ -222,10 +247,12 @@ export default {
 				this.info = data.applyEnterRoomEntity
 				this.files = data.jyApplyFiles
 				this.staffList = data.jyApplyPeople
-				this.processList = data.task.userList
-				this.taskId = data.task.taskId
-				this.processStatus = data.task.approveProcess
 				this.authCode = data.authCode || {}
+				if (data.task) {
+					this.processList = data.task.userList
+					this.taskId = data.task.taskId
+					this.processStatus = data.task.approveProcess
+				}
 			}
 		},
 		passClick() {
@@ -375,7 +402,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 	line-height: 40rpx;
-	color: #2391FF;
+	color: #2391ff;
 
 	text:not(:first-child) {
 		margin-top: 18rpx;
