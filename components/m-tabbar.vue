@@ -35,57 +35,39 @@ export default {
 	computed: {
 		...mapState(['roles', 'tabbarIdx']),
 		list() {
-			if (this.roles.includes('admin')) {
-				return [
-					{
-						pagePath: '/pages/home/index',
-						iconPath: 'static/img/home.png',
-						selectedIconPath: 'static/img/homeHL.png',
-						text: '首页'
-					},
-					{
-						pagePath: '/pages/access/apply',
-						iconPath: 'static/img/access.png',
-						selectedIconPath: 'static/img/accessHL.png',
-						text: '进出机房'
-					},
-					{
-						pagePath: '/pages/mine/index',
-						iconPath: 'static/img/mine.png',
-						selectedIconPath: 'static/img/mineHL.png',
-						text: '我的'
-					}
-				]
-			} else {
-				return [
-					{
-						pagePath: '/pages/home/index',
-						iconPath: 'static/img/home.png',
-						selectedIconPath: 'static/img/homeHL.png',
-						text: '首页'
-					},
-					{
-						pagePath: '/pages/access/approval',
-						iconPath: 'static/img/access.png',
-						selectedIconPath: 'static/img/accessHL.png',
-						text: '进出机房'
-					},
-					{
-						pagePath: '/pages/mine/index',
-						iconPath: 'static/img/mine.png',
-						selectedIconPath: 'static/img/mineHL.png',
-						text: '我的'
-					}
-				]
-			}
+			const pagePath = (this.roles.includes('admin') || this.roles.includes('common'))
+				? 'pages/access/apply'
+				: 'pages/access/approval'
+
+			return [
+				{
+					pagePath: 'pages/home/index',
+					iconPath: 'static/img/home.png',
+					selectedIconPath: 'static/img/homeHL.png',
+					text: '首页'
+				},
+				{
+					pagePath,
+					iconPath: 'static/img/access.png',
+					selectedIconPath: 'static/img/accessHL.png',
+					text: '进出机房'
+				},
+				{
+					pagePath: 'pages/mine/index',
+					iconPath: 'static/img/mine.png',
+					selectedIconPath: 'static/img/mineHL.png',
+					text: '我的'
+				}
+			]
 		}
 	},
 	methods: {
 		...mapMutations(['SET_TABBARIDX']),
-		switchTab(url, index) {
+		switchTab(path, index) {
 			if (index === this.tabbarIdx) return
+			const url = '/' + path
 			this.SET_TABBARIDX(index)
-			uni.reLaunch({ url })
+			uni.switchTab({ url })
 		}
 	}
 }

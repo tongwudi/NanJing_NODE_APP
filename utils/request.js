@@ -36,7 +36,7 @@ class Request {
 	 * 上传文件到服务器
 	 * @param {url} tempFile 文件临时地址
 	 * */
-	async upload(url, tempFile, config = {}) {
+	upload(url, tempFile, config = {}) {
 		const _this = this;
 		let newConfig = this._deepCopy(this._merge(this.config, config));
 		let lastConfig = {};
@@ -226,23 +226,20 @@ global.$request.interceptors.response(res => {
 		} else if (code === 401) {
 			uni.showToast({
 				title: '请重新登录',
-				icon: 'error',
-				duration: 2000
+				icon: 'error'
 			})
 			return res.data
 		} else {
 			uni.showToast({
 				title: msg,
-				icon: 'error',
-				duration: 2000
+				icon: 'error'
 			})
 			return res.data
 		}
 	} else {
 		uni.showToast({
 			title: '请求失败',
-			icon: 'error',
-			duration: 2000
+			icon: 'error'
 		})
 	}
 	// 您的逻辑......

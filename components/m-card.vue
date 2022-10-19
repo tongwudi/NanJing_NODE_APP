@@ -41,9 +41,8 @@ export default {
 .card {
 	margin: 20rpx;
 	border-radius: 12rpx;
-	border: 1rpx solid #edf0f3;
+	box-shadow: 0px 0px 0px 0.5px #e7edf0; // 0.5px线
 	background-color: #fff;
-	// box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.08);
 	position: relative;
 	&-title {
 		padding: 0 30rpx;

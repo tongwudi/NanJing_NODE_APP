@@ -47,28 +47,23 @@
 						:key="index"
 					>
 						<uni-col :span="isChecked ? 21 : 24">
-							<m-card
-								@tapClick="
-									viewDetail(
-										item.jyApplyEnterRoom.processInstanceId
-									)
-								"
-							>
+							<m-card @tapClick="viewDetail(item)">
 								<view class="card-content__body">
 									<view class="applicant">
-										<image src="@/static/logo.png"></image>
-										<view>
+										<image :src="item.applyUserAvatar" v-if="item.applyUserAvatar"></image>
+										<image src="@/static/img/avatar.png" v-else></image>
+										<view class="applicant-name">
 											<text>申请人</text>
-											<text>{{ item.jyApplyEnterRoom.applyUserName }}</text>
+											<text>{{ item.applyUserName }}</text>
 										</view>
 									</view>
 									<view>
 										<text>进出类型</text>
-										<text>{{ item.jyApplyEnterRoom.applyTypeName }}</text>
+										<text>{{ item.applyTypeName }}</text>
 									</view>
 									<view>
 										<text>申请时间</text>
-										<text>{{ item.jyApplyEnterRoom.applyTime }}</text>
+										<text>{{ item.applyTime }}</text>
 									</view>
 								</view>
 							</m-card>
@@ -90,7 +85,7 @@
 			<m-card
 				v-for="(item, index) in approvedList"
 				:key="index"
-				@tapClick="viewDetail(item.processInstanceId)"
+				@tapClick="viewDetail(item)"
 			>
 				<template v-slot:other>
 					<view
@@ -102,7 +97,7 @@
 					<button
 						class="cancel-btn"
 						v-if="item.processStatus === '0'"
-						@click.stop="revoke"
+						@click.stop="revoke(item.processInstanceId, index)"
 					>
 						撤销
 					</button>
@@ -110,8 +105,9 @@
 
 				<view class="card-content__body">
 					<view class="applicant">
-						<image src="../../static/logo.png"></image>
-						<view class="">
+						<image :src="item.applyUserAvatar" v-if="item.applyUserAvatar"></image>
+						<image src="@/static/img/avatar.png" v-else></image>
+						<view class="applicant-name">
 							<text>申请人</text>
 							<text>{{ item.applyUserName }}</text>
 						</view>
@@ -143,7 +139,7 @@
 </template>
 
 <script>
-import { getApplyType, searchTodo, getApprovedRecord } from '@/api/index.js'
+import { getApplyType, searchTodo, getApprovedRecord, recallTask } from '@/api/index.js'
 export default {
 	data() {
 		return {
@@ -158,7 +154,9 @@ export default {
 			pageNum: 1,
 			pageSize: 10,
 			applyList: [],
-			approvedList: []
+			approvedList: [],
+			processInstanceId: '',
+			curIdx: 0
 		}
 	},
 	filters: {
@@ -267,7 +265,10 @@ export default {
 			}
 			const res = await searchTodo(params)
 			if (res.code === 200) {
-				this.applyList = this.applyList.concat(res.rows)
+				const rows = res.rows.map(item => {
+					return item.jyApplyEnterRoom
+				})
+				this.applyList = this.applyList.concat(rows)
 				if (this.applyList.length === res.total) {
 					this.isLoadMore = true
 					this.loadStatus = 'nomore'
@@ -305,14 +306,29 @@ export default {
 			const values = e.detail.value
 			this.batchIds = values
 		},
-		viewDetail(id) {
-			uni.navigateTo({ url: './detail?id=' + id })
+		viewDetail(item) {
+			const { processInstanceId, processStatus } = item
+			uni.navigateTo({ url: `./detail?id=${processInstanceId}&status=${processStatus}` })
 		},
-		revoke() {
+		revoke(processInstanceId, index) {
+			this.processInstanceId = processInstanceId
+			this.curIdx = index
 			this.$refs.popup.open()
 		},
-		dialogConfirm(value) {
-			this.$refs.popup.close()
+		async dialogConfirm(value) {
+			uni.showLoading({
+				mask: true,
+				title: '加载中'
+			})
+			const res = await recallTask({ processInstanceId: this.processInstanceId })
+			if (res.code === 200) {
+				this.$refs.popup.close()
+				uni.showToast({
+					title: '撤销成功',
+					icon: 'success'
+				})
+				this.approvedList[this.curIdx].processStatus = 3
+			}
 		}
 	}
 }

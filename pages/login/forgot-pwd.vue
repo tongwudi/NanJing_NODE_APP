@@ -7,25 +7,24 @@
 		<view class="nav">
 			<m-nav left-icon="left"></m-nav>
 
-			<view class="title">忘记密码</view>
+			<view class="page-title">忘记密码</view>
 		</view>
 
 		<m-card>
 			<uni-forms
 				ref="registerForm"
 				err-show-type="toast"
-				:labelWidth="75"
 				:model="formData"
 				:rules="rules"
 			>
-				<uni-forms-item label="邮箱" name="email">
+				<uni-forms-item name="email">
 					<uni-easyinput
 						type="email"
 						v-model="formData.email"
 						placeholder="请输入邮箱"
 					/>
 				</uni-forms-item>
-				<uni-forms-item label="验证码" name="code">
+				<uni-forms-item name="code">
 					<view class="code-row">
 						<uni-easyinput
 							v-model="formData.code"
@@ -44,14 +43,14 @@
 						</button>
 					</view>
 				</uni-forms-item>
-				<uni-forms-item label="新密码" name="password">
+				<uni-forms-item name="password">
 					<uni-easyinput
 						type="password"
 						v-model="formData.password"
 						placeholder="请输入新密码"
 					/>
 				</uni-forms-item>
-				<uni-forms-item label="确认密码" name="confirmPassword">
+				<uni-forms-item name="confirmPassword">
 					<uni-easyinput
 						type="password"
 						v-model="formData.confirmPassword"
@@ -70,12 +69,7 @@
 </template>
 
 <script>
-import {
-	email,
-	verify,
-	password,
-	confirmPassword
-} from '@/utils/validate.js'
+import { email, verify, password, confirmPassword } from '@/utils/validate.js'
 import { sendEmail, forgetCode } from '@/api/index.js'
 export default {
 	data() {
@@ -142,12 +136,18 @@ export default {
 </script>
 
 <style lang="scss">
-.title {
-	padding: 40rpx;
-	line-height: 1.5;
-	font-size: 64rpx;
-	font-weight: bold;
-	color: #1f1f39;
+$input-height: 80rpx;
+
+/deep/ {
+	.is-required {
+		display: none;
+	}
+	.uni-forms-item__label {
+		padding: 0 !important;
+	}
+	.uni-easyinput__content-input {
+		height: $input-height !important;
+	}
 }
 
 .card {
@@ -155,15 +155,12 @@ export default {
 	margin: 0 !important;
 }
 
-/deep/ .uni-forms-item__label {
-	color: #333;
-}
-
 .code-row {
 	display: flex;
 
 	button {
-		height: 70rpx;
+		height: $input-height;
+		line-height: $input-height;
 		font-size: 28rpx;
 		margin-left: 20rpx;
 	}
@@ -176,6 +173,6 @@ export default {
 }
 
 .btn-row {
-	margin: 92rpx 0 0;
+	margin: $input-height 0 0;
 }
 </style>

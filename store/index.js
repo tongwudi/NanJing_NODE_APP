@@ -1,9 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import request from '@/utils/request.js'
-import {
-	getInfo
-} from '@/api/index.js'
+import { getInfo } from '@/api/index.js'
 
 Vue.use(Vuex)
 
@@ -12,7 +10,7 @@ const store = new Vuex.Store({
 		token: uni.getStorageSync('token'),
 		roles: uni.getStorageSync('roles') || [],
 		userInfo: uni.getStorageSync('userInfo') || {},
-		tabbarIdx: uni.getStorageSync('tabbarIdx') || 0
+		tabbarIdx: uni.getStorageSync('tabbarIdx') || 2
 	},
 	mutations: {
 		SET_TOKEN(state, token) {
@@ -52,8 +50,11 @@ const store = new Vuex.Store({
 		async GetInfo(ctx) {
 			const { code, roles, user } = await getInfo()
 			if (code === 200) {
+				uni.hideTabBar()
 				ctx.commit('SET_ROLES', roles)
 				ctx.commit('SET_USERINFO', user)
+				ctx.commit('SET_TABBARIDX', 2)
+				uni.switchTab({ url: '/pages/mine/index' })
 			}
 		},
 		Logout(ctx) {
@@ -61,6 +62,7 @@ const store = new Vuex.Store({
 			ctx.commit('CLEAR_ROLES')
 			ctx.commit('CLEAR_USERINFO')
 			ctx.commit('CLEAR_TABBARIDX')
+			uni.reLaunch({ url: '/pages/login/login' })
 		}
 	}
 })

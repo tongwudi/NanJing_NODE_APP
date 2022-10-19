@@ -101,23 +101,23 @@
 						v-for="(item, index) in processList"
 						:key="index"
 					>
-						<view class="item-info">
+						<view class="applicant">
+							<image :src="item.avatar" v-if="item.avatar"></image>
+							<image src="@/static/img/avatar.png" v-else></image>
 							<view class="applicant-name">
-								<image src="/static/logo.png"></image>
-								<view class="flx-clm">
-									<text>{{ item.nodeName }}</text>
-									<text>{{ item.assigneeName }}</text>
-								</view>
+								<text>{{ item.nodeName }}</text>
+								<text>{{ item.assigneeName }}</text>
 							</view>
-							<view class="applicant-status flx-clm">
-								<template v-if="item.approveTime">
-									<text>{{ item.nodeName }}</text>
-									<uni-dateformat :date="item.approveTime"></uni-dateformat>
-								</template>
-								<text v-else class="unapproved">未开始</text>
+							<view class="applicant-status" v-if="item.approveTime">
+								<text>{{ item.approveOperate }}</text>
+								<uni-dateformat :date="item.approveTime"></uni-dateformat>
 							</view>
+							<text v-else class="unapproved">未开始</text>
 						</view>
-						<view class="item-line"></view>
+						<view class="item-other">
+							<view class="line"></view>
+							<view class="comment" v-if="item.approveNote">{{ item.approveNote }}</view>
+						</view>
 					</view>
 				</view>
 			</m-card>
@@ -199,18 +199,18 @@
 
 <script>
 import { mapState } from 'vuex'
-import { viewTask, completeTask } from '@/api/index.js'
+import { viewTask, viewTaskEnd, completeTask } from '@/api/index.js'
 export default {
 	data() {
 		return {
 			processInstanceId: '',
+			processStatus: '',
 			popupText: '',
 			info: {},
 			files: [],
 			staffList: [],
 			processList: [],
 			taskId: '',
-			processStatus: '',
 			authCode: {}
 		}
 	},
@@ -219,6 +219,7 @@ export default {
 	},
 	async onLoad(params) {
 		this.processInstanceId = params.id
+		this.processStatus = params.status
 
 		uni.showLoading({
 			mask: true,
@@ -238,20 +239,28 @@ export default {
 			}
 		},
 		async getDetail() {
-			const params = {
-				processInstanceId: this.processInstanceId
+			const params = { processInstanceId: this.processInstanceId }
+			let res;
+			if (this.processStatus == 2 || this.processStatus == 3) {
+				res = await viewTaskEnd(params)
+			} else {
+				res = await viewTask(params)
 			}
-			const res = await viewTask(params)
 			const { data, code } = res
 			if (code === 200) {
 				this.info = data.applyEnterRoomEntity
 				this.files = data.jyApplyFiles
 				this.staffList = data.jyApplyPeople
-				this.authCode = data.authCode || {}
-				if (data.task) {
-					this.processList = data.task.userList
-					this.taskId = data.task.taskId
-					this.processStatus = data.task.approveProcess
+
+				if (this.processStatus == 2 || this.processStatus == 3) {
+					this.processList = data.approveHistoryList
+				} else {
+					this.authCode = data.authCode || {}
+
+					const { userList, taskId, approveProcess} = data.task
+					this.processList = userList
+					this.taskId = taskId
+					this.processStatus = approveProcess
 				}
 			}
 		},
@@ -326,48 +335,32 @@ export default {
 .timeline-item {
 	flex-direction: column;
 	margin-bottom: 0 !important;
-	&:last-child .item-line {
+	&:last-child .item-other .line {
 		display: none;
 	}
-	.item-info {
-		display: flex;
-		justify-content: space-between;
-		.applicant-name {
-			display: flex;
-			image {
-				width: 80rpx;
-				height: 80rpx;
-				border-radius: 50%;
-			}
-			& > view {
-				margin-left: 20rpx;
-				text:last-child {
-					font-size: 28rpx;
-					color: #333;
-				}
-			}
-		}
-		.applicant-status {
-			align-self: center;
-			text-align: right;
-			// color: #ff8a00;
-		}
-		.flx-clm {
-			display: flex;
-			flex-direction: column;
-			color: #666;
-			text {
-				line-height: 40rpx;
-				font-size: 24rpx;
-			}
-		}
+	.unapproved {
+		align-self: center;
+		font-size: 24rpx;
+		color: #ff8a00;
 	}
-	.item-line {
-		width: 2px;
-		height: 60rpx;
-		margin: 10rpx 0;
+	.item-other {
+		display: flex;
 		margin-left: 40rpx;
-		background-color: #dcdcdc;
+		.line {
+			width: 2px;
+			min-height: 60rpx;
+			margin: 10rpx 0;
+			background-color: #dcdcdc;
+		}
+		.comment {
+			flex: 1;
+			margin: 20rpx 60rpx;
+			margin-right: 0;
+			padding: 20rpx;
+			border-radius: 12rpx;
+			line-height: 1.5;
+			background-color: #ececec;
+		}
 	}
 }
 
@@ -392,10 +385,6 @@ export default {
 		padding: 0 20rpx;
 		border-radius: 8rpx;
 	}
-}
-
-.unapproved {
-	color: #ff8a00;
 }
 
 .annex-list {

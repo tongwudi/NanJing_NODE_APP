@@ -11,6 +11,18 @@
 	background-image: linear-gradient(to bottom, transparent, #f4f5f6);
 }
 
+.navbar-placeholder {
+	height: 44px;
+}
+
+.page-title {
+	padding: 40rpx;
+	line-height: 1.5;
+	font-size: 64rpx;
+	font-weight: bold;
+	color: #1f1f39;
+}
+
 .uni-forms {
 	.content-clear-icon {
 		font-size: 44rpx !important;
@@ -20,6 +32,7 @@
 		font-size: 28rpx !important;
 		color: #999 !important;
 	}
+	button,
 	image,
 	.is-input-border {
 		border-radius: 12rpx !important;
@@ -67,11 +80,17 @@
 		}
 	}
 	.applicant {
+		display: flex;
 		image {
 			width: 80rpx;
 			height: 80rpx;
+			border-radius: 50%;
+			box-shadow: 0px 0px 0px 1px #e7edf0; // 0.5px线
+			background-color: #fff;
+			overflow: hidden;
 		}
-		> view {
+		&-name {
+			flex: 1;
 			display: flex;
 			flex-direction: column;
 			margin-left: 20rpx;
@@ -83,6 +102,15 @@
 					color: #666666;
 				}
 			}
+		}
+		&-status {
+			display: flex;
+			flex-direction: column;
+			font-size: 24rpx;
+			line-height: 40rpx;
+			margin-left: 20rpx;
+			text-align: right;
+			color: #666;
 		}
 	}
 	.bold {

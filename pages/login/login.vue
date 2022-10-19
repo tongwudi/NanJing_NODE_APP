@@ -2,35 +2,39 @@
 	<view class="container">
 		<view class="status_bar"><!-- 这里是状态栏 --></view>
 
-		<view class="title">
+		<view class="navbar-placeholder"></view>
+		
+		<view class="page-title">
 			<view>南京机房智能运维</view>
 			<view>支撑平台</view>
 		</view>
 
 		<uni-forms
 			ref="loginForm"
-			label-position="top"
 			err-show-type="toast"
 			:model="formData"
 			:rules="rules"
 		>
-			<uni-forms-item label="手机号" name="phonenumber">
+			<uni-forms-item name="phonenumber">
 				<uni-easyinput
 					type="number"
 					v-model="formData.phonenumber"
 					placeholder="请输入手机号"
 				/>
 			</uni-forms-item>
-			<uni-forms-item label="密码" name="password">
+			<uni-forms-item name="password">
 				<uni-easyinput
 					type="password"
 					v-model="formData.password"
 					placeholder="请输入密码"
 				/>
 			</uni-forms-item>
-			<uni-forms-item label="验证码" name="code">
+			<uni-forms-item name="code">
 				<view class="code-row">
-					<uni-easyinput v-model="formData.code" />
+					<uni-easyinput
+						v-model="formData.code"
+						placeholder="请输入验证码"
+					/>
 					<image :src="codeUrl" @click="getCodeUrl"></image>
 				</view>
 			</uni-forms-item>
@@ -96,7 +100,6 @@ export default {
 			this.isRememberPwd = true
 		}
 		this.getCodeUrl()
-		this.$store.dispatch('Logout')
 	},
 	methods: {
 		...mapMutations(['SET_TOKEN']),
@@ -133,8 +136,8 @@ export default {
 						uni.removeStorageSync('password')
 					}
 					this.SET_TOKEN(res.token)
+
 					this.GetInfo()
-					uni.redirectTo({ url: '/pages/home/index' })
 				} else {
 					this.getCodeUrl()
 				}
@@ -145,8 +148,10 @@ export default {
 </script>
 
 <style lang="scss">
+$input-height: 88rpx;
+	
 .container {
-	padding: 40rpx;
+	// padding: 40rpx;
 	background-image: linear-gradient(
 		to right bottom,
 		rgba(250, 255, 217, 0.3),
@@ -155,12 +160,8 @@ export default {
 	);
 }
 
-.title {
-	padding: 88rpx 0 70rpx;
-	line-height: 1.5;
-	font-size: 64rpx;
-	font-weight: bold;
-	color: #1f1f39;
+.uni-forms {
+	padding: 40rpx;
 }
 
 /deep/ {
@@ -170,14 +171,11 @@ export default {
 
 	.uni-forms-item__label {
 		padding: 0 !important;
-		height: 60rpx !important;
-		line-height: 1 !important;
-		color: #858597;
 	}
 
 	image,
 	.uni-easyinput__content-input {
-		height: 80rpx !important;
+		height: $input-height !important;
 	}
 }
 
@@ -185,7 +183,7 @@ export default {
 	display: flex;
 
 	image {
-		width: 40%;
+		width: 240rpx;
 		margin-left: 40rpx;
 	}
 }
@@ -207,7 +205,7 @@ navigator {
 }
 
 .btn-row {
-	margin: 80rpx 0 0;
+	margin: $input-height 0 0;
 }
 
 .register-row {

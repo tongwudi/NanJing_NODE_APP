@@ -1,11 +1,8 @@
 <script>
 export default {
 	onLaunch: function() {
-		uni.hideTabBar()
 		console.log('App Launch')
-	},
-	onShow: function() {
-		console.log('App Show')
+		uni.hideTabBar()
 	},
 	onHide: function() {
 		console.log('App Hide')
@@ -22,7 +19,7 @@ page {
 	min-height: 100%;
 	height: auto;
 	display: flex;
-	font-size: 14px;
+	font-size: 28rpx;
 	color: #333;
 }
 

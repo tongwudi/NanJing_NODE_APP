@@ -7,50 +7,49 @@
 		<view class="nav">
 			<m-nav left-icon="left"></m-nav>
 
-			<view class="title">注册</view>
+			<view class="page-title">注册</view>
 		</view>
 
 		<m-card>
 			<uni-forms
 				ref="form"
 				err-show-type="toast"
-				:labelWidth="75"
 				:model="formData"
 				:rules="rules"
 			>
-				<uni-forms-item label="姓名" name="nickName">
+				<uni-forms-item name="nickName">
 					<uni-easyinput
 						v-model="formData.nickName"
 						placeholder="请输入姓名"
 					/>
 				</uni-forms-item>
-				<uni-forms-item label="手机号" name="phonenumber">
+				<uni-forms-item name="phonenumber">
 					<uni-easyinput
 						type="number"
 						v-model="formData.phonenumber"
 						placeholder="请输入手机号"
 					/>
 				</uni-forms-item>
-				<uni-forms-item label="身份号码" name="idcard">
+				<uni-forms-item name="idcard">
 					<uni-easyinput
 						v-model="formData.idcard"
 						placeholder="请输入身份号码"
 					/>
 				</uni-forms-item>
-				<uni-forms-item label="邮箱" name="email">
+				<uni-forms-item name="email">
 					<uni-easyinput
 						v-model="formData.email"
 						placeholder="请输入邮箱"
 					/>
 				</uni-forms-item>
-				<uni-forms-item label="密码" name="password">
+				<uni-forms-item name="password">
 					<uni-easyinput
 						type="password"
 						v-model="formData.password"
 						placeholder="请输入密码"
 					/>
 				</uni-forms-item>
-				<uni-forms-item label="确认密码" name="confirmPassword">
+				<uni-forms-item name="confirmPassword">
 					<uni-easyinput
 						type="password"
 						v-model="formData.confirmPassword"
@@ -117,12 +116,18 @@ export default {
 </script>
 
 <style lang="scss">
-.title {
-	padding: 40rpx;
-	line-height: 1.5;
-	font-size: 64rpx;
-	font-weight: bold;
-	color: #1f1f39;
+$input-height: 80rpx;
+
+/deep/ {
+	.is-required {
+		display: none;
+	}
+	.uni-forms-item__label {
+		padding: 0 !important;
+	}
+	.uni-easyinput__content-input {
+		height: $input-height !important;
+	}
 }
 
 .card {
@@ -130,11 +135,7 @@ export default {
 	margin: 0 !important;
 }
 
-/deep/.uni-forms-item__label {
-	color: #333;
-}
-
 .btn-row {
-	margin: 92rpx 0 0;
+	margin: $input-height 0 0;
 }
 </style>

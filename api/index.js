@@ -20,6 +20,8 @@ export const getApplyList = data => http.get('/enter/room/applyList', data)
 export const searchTodo = data => http.get('/enter/room/searchTodo', data)
 // 详情
 export const viewTask = data => http.get('/enter/room/viewTask', data)
+// 驳回/撤销 详情
+export const viewTaskEnd = data => http.get('/enter/room/viewTaskEnd', data)
 // 扫码详情
 export const getRoomInfo = data => http.get('/enter/room/roomInfo', data)
 // 验证打卡
@@ -42,4 +44,3 @@ export const getLeader = () => http.get('/enter/room/getLeader')
 export const getApplyType = () => http.get('/apply/type/list')
 // 文件上传
 export const uploadFiles = data => http.upload('/enter/room/uploadFiles', data)
-

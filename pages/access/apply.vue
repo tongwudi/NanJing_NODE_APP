@@ -185,11 +185,7 @@
 					<template v-slot:other>
 						<view
 							class="card-status"
-							:class="[
-								'authCodeDto' in item
-									? renderCodeStatusBgColor(item.authCodeDto.value)
-									: renderStatusBgColor(item.processStatus)
-							]"
+							:class="[renderStatus(item)]"
 						>
 							{{
 								'authCodeDto' in item
@@ -204,7 +200,7 @@
 									item.authCodeDto.status === '0') ||
 									item.processStatus === '0'
 							"
-							@click.stop="revoke(item.processInstanceId)"
+							@click.stop="revoke(item.processInstanceId, index)"
 						>
 							撤销
 						</button>
@@ -290,7 +286,8 @@ export default {
 			pageNum: 1,
 			pageSize: 10,
 			applyList: [],
-			processInstanceId: ''
+			processInstanceId: '',
+			curIdx: 0
 		}
 	},
 	onLoad() {
@@ -336,6 +333,15 @@ export default {
 				return 'status-ysx'
 			} else {
 				return 'status-djh'
+			}
+		},
+		renderStatus (item) {
+			if (item.processStatus == 3) {
+				return this.renderStatusBgColor(item.processStatus)
+			} else if ('authCodeDto' in item) {
+				return this.renderCodeStatusBgColor(item.authCodeDto.value)
+			} else {
+				return this.renderStatusBgColor(item.processStatus)
 			}
 		},
 		onPullDownRefresh() {
@@ -512,8 +518,9 @@ export default {
 		viewDetail(id) {
 			uni.navigateTo({ url: './detail?id=' + id })
 		},
-		revoke(processInstanceId) {
+		revoke(processInstanceId, index) {
 			this.processInstanceId = processInstanceId
+			this.curIdx = index
 			this.$refs.popup.open()
 		},
 		async dialogConfirm() {
@@ -525,10 +532,10 @@ export default {
 			if (res.code === 200) {
 				this.$refs.popup.close()
 				uni.showToast({
-					title: '数据已驳回',
+					title: '撤销成功',
 					icon: 'success'
 				})
-				this.renderCodeStatusBgColor(3)
+				this.applyList[this.curIdx].processStatus = 3
 			}
 		}
 	}
@@ -539,6 +546,12 @@ export default {
 /deep/ {
 	.uni-forms-item__label {
 		color: #333;
+		height: 72rpx !important;
+	}
+	.uni-easyinput__content-input,
+	.uni-date__x-input,
+	.input-value {
+		height: 70rpx !important;
 	}
 	.uni-forms-item__content {
 		width: 0;
@@ -555,14 +568,6 @@ export default {
 		button {
 			line-height: 72rpx !important;
 		}
-	}
-	.uni-forms-item__label {
-		height: 72rpx !important;
-	}
-	.uni-date__x-input,
-	.uni-easyinput__content-input,
-	.input-value {
-		height: 70rpx !important;
 	}
 }
 // .uniui-calendar {
