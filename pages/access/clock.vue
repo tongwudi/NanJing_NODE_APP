@@ -129,28 +129,22 @@ export default {
 	},
 	methods: {
 		async getInfo() {
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
 			const res = await getRoomInfo({ roomId: this.roomId })
 			if (res.code === 200) {
-				uni.hideLoading()
 				this.roomInfo = res.data
 			}
 		},
 		async submitValid() {
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
 			const params = {
 				roomId: this.roomId,
 				code: this.code
 			}
 			const res = await verifyCode(params)
 			if (res.code === 200) {
-				uni.showToast({ title: '验证成功' })
+				uni.showToast({
+					title: '验证成功',
+					icon: 'success'
+				})
 				const { code, data } = await getVisitInfo({ processInstanceId: res.msg })
 				if (code === 200) {
 					this.visitInfo = data.visitInfo
@@ -160,10 +154,6 @@ export default {
 			}
 		},
 		async onClock() {
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
 			const params = {
 				taskId: this.taskId,
 				status: 'yes' // 审批状态(yes-通过 no-驳回)

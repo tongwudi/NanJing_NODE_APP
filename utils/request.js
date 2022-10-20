@@ -18,11 +18,14 @@ class Request {
 			}
 		}
 	}
-	async get(url, data = {}) {
-		const config = { data }
+	/**
+	 * @param showLoading 是否开启全局 loading 效果，引用了 uni-load-more 组件的不必要开启
+	 * */
+	async get(url, data = {}, showLoading = true) {
+		const config = { data, showLoading }
 		return this._request('get', url, config);
 	}
-	async post(url, data = {}) {
+	async post(url, data = {}, showLoading = true) {
 		const config = { data }
 		return this._request('post', url, config);
 	}
@@ -34,7 +37,7 @@ class Request {
 	}
 	/**
 	 * 上传文件到服务器
-	 * @param {url} tempFile 文件临时地址
+	 * @param tempFile 文件临时地址
 	 * */
 	upload(url, tempFile, config = {}) {
 		const _this = this;
@@ -93,6 +96,8 @@ class Request {
 		return this.config;
 	}
 	_request(method, url, config) {
+		this.setConfig(config)
+
 		const _this = this;
 		let newConfig = this._deepCopy(this._merge(this.config, config));
 		let lastConfig = {};
@@ -121,6 +126,7 @@ class Request {
 				timeout: 20000, // 超时时间 20s
 				async complete(response) {
 					let res = response;
+					res.showLoading = config.showLoading
 					if (_this.resInterceptors && typeof _this.resInterceptors === 'function') {
 						let resInterceptors = _this.resInterceptors(res);
 						if (!resInterceptors) {
@@ -192,43 +198,60 @@ if (!global.$request) {
 	global.$request = new Request();
 }
 
-
+// app不支持 api 代理，要写完整地址
 global.$request.setConfig({
-	// app不支持 api 代理，要写完整地址
 	baseUrl: 'http://2c7255v996.51vip.biz'
 })
+
+// 避免出现 "请注意 showLoading 与 hideLoading 必须配对使用" 警告
+let count = 0
+
 // 设置请求拦截器
 global.$request.interceptors.request(config => {
 	// 配置参数和全局配置相同，此优先级最高，会覆盖在其他地方的相同配置参数
 
 	// 追加请求头，推荐
 	// config.header['content-type'] = 'application/json';
-	const token = store.state.token;
-	!!token && (config.header['Authorization'] = 'Bearer ' + token)
-
 	// 覆盖请求头
 	// config.header = {
 	// 'content-type': 'application/json',
 	// 'token': 'token from interceptors'
 	// }
+	const token = store.state.token;
+	!!token && (config.header['Authorization'] = 'Bearer ' + token)
+
+	// showLoading 与 showToast 共用提示框，使用 showToast 与 hideLoading 效果相同
+	if (config.showLoading) {
+		count++
+		uni.showLoading({
+			title: "加载中",
+			mask: true,
+		});
+	}
 
 	// return false; // 终止请求
 	// return Promise.reject('error from request interceptors'); // 向外层抛出错误，用catch捕获
 	return config; // 返回修改后的配置，如未修改也需添加这行
 })
+
 // 设置响应拦截器
 global.$request.interceptors.response(res => {
 	// 接收请求，执行响应操作
 	if (res.statusCode == 200) {
 		const { code, msg } = res.data
+
+		// 一般情况页面不需要再次判断code值，除非逻辑需要非200判断，比如登录时验证码错误会返回500
 		if (code === 200) {
+			if (res.showLoading) {
+				count--
+				uni.hideLoading()
+			}
 			return res.data
 		} else if (code === 401) {
 			uni.showToast({
 				title: '请重新登录',
 				icon: 'error'
 			})
-			return res.data
 		} else {
 			uni.showToast({
 				title: msg,
@@ -241,6 +264,7 @@ global.$request.interceptors.response(res => {
 			title: '请求失败',
 			icon: 'error'
 		})
+		uni.stopPullDownRefresh()
 	}
 	// 您的逻辑......
 	// return false;    // 阻止返回,页面不会接收返回值

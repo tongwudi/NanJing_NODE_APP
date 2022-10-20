@@ -35,9 +35,18 @@ export default {
 	computed: {
 		...mapState(['roles', 'tabbarIdx']),
 		list() {
-			const pagePath = (this.roles.includes('admin') || this.roles.includes('common'))
-				? 'pages/access/apply'
-				: 'pages/access/approval'
+			/**
+			 * @admin 管理员
+			 * @common 访客/申请人
+			 * @manager 项目经理
+			 * @network 网格员
+			 * @maintaining 代维
+			 **/
+			const pagePath =
+				!this.roles.includes('admin') &&
+				this.roles.includes('manager' || 'network' || 'maintaining')
+					? 'pages/access/approval'
+					: 'pages/access/apply'
 
 			return [
 				{

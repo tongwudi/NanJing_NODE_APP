@@ -94,10 +94,6 @@ export default {
 	methods: {
 		sendCode(ref) {
 			this.$refs[ref].validateField(['email']).then(async data => {
-				uni.showLoading({
-					mask: true,
-					title: '加载中'
-				})
 				const res = await sendEmail({ email: data.email })
 				if (res.code === 200) {
 					uni.showToast({ title: '验证码已发送' })
@@ -116,10 +112,6 @@ export default {
 		},
 		submitForm(ref) {
 			this.$refs[ref].validate().then(async data => {
-				uni.showLoading({
-					mask: true,
-					title: '加载中'
-				})
 				const params = {
 					...this.formData,
 					newPassword: this.formData.password
@@ -127,7 +119,10 @@ export default {
 				delete params.password
 				const res = await forgetCode(params)
 				if (res.code === 200) {
-					uni.showToast({ title: '修改成功' })
+					uni.showToast({ 
+						title: '修改成功',
+						icon: 'success'
+					 })
 				}
 			})
 		}

@@ -15,9 +15,9 @@ export const getInfo = () => http.get('/getInfo')
 // 发起申请
 export const startApply = data => http.post('/enter/room/start', data)
 // 申请列表
-export const getApplyList = data => http.get('/enter/room/applyList', data)
+export const getApplyList = data => http.get('/enter/room/applyList', data, false)
 // 待审批列表（我的待办）
-export const searchTodo = data => http.get('/enter/room/searchTodo', data)
+export const searchTodo = data => http.get('/enter/room/searchTodo', data, false)
 // 详情
 export const viewTask = data => http.get('/enter/room/viewTask', data)
 // 驳回/撤销 详情
@@ -33,7 +33,7 @@ export const completeTask = data => http.post('/enter/room/completeTask', data)
 // 撤销
 export const recallTask = data => http.get('/enter/room/recallTask', data)
 // 审批记录列表
-export const getApprovedRecord = data => http.post('/enter/room/doneList', data)
+export const doneList = data => http.get('/enter/room/doneList', data)
 // 获取行政区域
 export const getCounty = () => http.get('/room/info/getCounty')
 // 根据区域获取机房

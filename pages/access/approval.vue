@@ -23,11 +23,12 @@
 
 		<view class="content" v-show="tabIndex === 0">
 			<view class="select-row">
+				<view class="readonly-selct" v-if="isChecked"></view>
 				<uni-data-picker
 					placeholder="请选择进出类型"
+					v-else
 					v-model="applyType"
 					:clear-icon="false"
-					:readonly="applyList.length === 0 || isChecked"
 					:localdata="applyTypeList"
 					@change="changeApplyType"
 				></uni-data-picker>
@@ -40,123 +41,119 @@
 			</view>
 
 			<checkbox-group @change="checkedChange">
-				<template v-if="applyList.length > 0">
-					<uni-row
-						class="swipe-box"
-						v-for="(item, index) in applyList"
-						:key="index"
-					>
-						<uni-col :span="isChecked ? 21 : 24">
-							<m-card @tapClick="viewDetail(item)">
-								<view class="card-content__body">
-									<view class="applicant">
-										<image :src="item.applyUserAvatar" v-if="item.applyUserAvatar"></image>
-										<image src="@/static/img/avatar.png" v-else></image>
-										<view class="applicant-name">
-											<text>申请人</text>
-											<text>{{ item.applyUserName }}</text>
-										</view>
-									</view>
-									<view>
-										<text>进出类型</text>
-										<text>{{ item.applyTypeName }}</text>
-									</view>
-									<view>
-										<text>申请时间</text>
-										<text>{{ item.applyTime }}</text>
+				<view
+					class="slide-box"
+					v-for="(item, index) in applyList"
+					:key="index"
+				>
+					<view class="slide-box_left">
+						<m-card @tapClick="viewDetail(item)">
+							<view class="card-content__body">
+								<view class="applicant">
+									<image :src="item.applyUserAvatar" v-if="item.applyUserAvatar"></image>
+									<image src="@/static/img/avatar.png" v-else></image>
+									<view class="applicant-name">
+										<text>申请人</text>
+										<text>{{ item.applyUserName }}</text>
 									</view>
 								</view>
-							</m-card>
-						</uni-col>
-						<uni-col
-							class="swipe-box_right"
-							:span="isChecked ? 3 : 0"
-						>
-							<checkbox :value="index + ''" />
-						</uni-col>
-					</uni-row>
-					<uni-load-more :status="loadStatus"></uni-load-more>
-				</template>
-				<view v-else class="no-data">暂无数据</view>
+								<view>
+									<text>进出类型</text>
+									<text>{{ item.applyTypeName }}</text>
+								</view>
+								<view>
+									<text>申请时间</text>
+									<text>{{ item.applyTime }}</text>
+								</view>
+							</view>
+						</m-card>
+					</view>
+					<view class="slide-box_right" :style="{ width: isChecked ? '15%': 0 }">
+						<checkbox :value="index + ''" />
+					</view>
+				</view>
 			</checkbox-group>
+			<uni-load-more
+				:status="loadStatus"
+				:class="{
+					'no-data':
+						loadStatus === 'loading' ||
+						(loadStatus === 'nomore' && !applyList.length)
+				}"
+			/>
 		</view>
 
 		<view class="content" v-show="tabIndex === 1">
-			<m-card
-				v-for="(item, index) in approvedList"
-				:key="index"
-				@tapClick="viewDetail(item)"
-			>
-				<template v-slot:other>
-					<view
-						class="card-status"
-						:class="[renderStatusBgColor(item.processStatus)]"
-					>
-						{{ item.processStatus | filterStatusText }}
-					</view>
-					<button
-						class="cancel-btn"
-						v-if="item.processStatus === '0'"
-						@click.stop="revoke(item.processInstanceId, index)"
-					>
-						撤销
-					</button>
-				</template>
+			<view class="approved-list">
+				<m-card
+					v-for="(item, index) in approvedList"
+					:key="index"
+					@tapClick="viewDetail(item)"
+				>
+					<template v-slot:other>
+						<view
+							class="card-status"
+							:class="[renderStatusBgColor(item.processStatus)]"
+						>
+							{{ item.processStatus | filterStatusText }}
+						</view>
+					</template>
 
-				<view class="card-content__body">
-					<view class="applicant">
-						<image :src="item.applyUserAvatar" v-if="item.applyUserAvatar"></image>
-						<image src="@/static/img/avatar.png" v-else></image>
-						<view class="applicant-name">
-							<text>申请人</text>
-							<text>{{ item.applyUserName }}</text>
+					<view class="card-content__body">
+						<view class="applicant">
+							<image :src="item.applyUserAvatar" v-if="item.applyUserAvatar"></image>
+							<image src="@/static/img/avatar.png" v-else></image>
+							<view class="applicant-name">
+								<text>申请人</text>
+								<text>{{ item.applyUserName }}</text>
+							</view>
+						</view>
+						<view>
+							<text>进出类型</text>
+							<text>{{ item.applyTypeName }}</text>
+						</view>
+						<view>
+							<text>申请时间</text>
+							<text>{{ item.applyTime }}</text>
 						</view>
 					</view>
-					<view>
-						<text>进出类型</text>
-						<text>{{ item.applyTypeName }}</text>
-					</view>
-					<view>
-						<text>申请时间</text>
-						<text>{{ item.applyTime }}</text>
-					</view>
-				</view>
-			</m-card>
+				</m-card>
+			</view>
+			<uni-load-more
+				:status="loadStatus"
+				:class="{
+					'no-data':
+						loadStatus === 'loading' ||
+						(loadStatus === 'nomore' && !approvedList.length)
+				}"
+			/>
 		</view>
 
-		<uni-popup ref="popup" type="dialog">
-			<uni-popup-dialog
-				type="info"
-				cancelText="取消"
-				confirmText="确定"
-				content="确认撤销审批？"
-				@confirm="dialogConfirm"
-			></uni-popup-dialog>
-		</uni-popup>
-		
 		<m-tabbar />
 	</view>
 </template>
 
 <script>
-import { getApplyType, searchTodo, getApprovedRecord, recallTask } from '@/api/index.js'
+import { getApplyType, searchTodo, doneList } from '@/api/index.js'
 export default {
 	data() {
 		return {
 			tabs: [{ name: '待审批' }, { name: '审批记录' }],
 			tabIndex: 0,
-			applyTypeList: [],
 			applyType: '',
+			applyTypeList: [],
 			isChecked: false,
 			batchIds: [],
 			loadStatus: '',
 			isLoadMore: false,
-			pageNum: 1,
-			pageSize: 10,
+			applyPagination: {
+				pageNum: 1
+			},
+			approvedPagination: {
+				pageNum: 1
+			},
 			applyList: [],
-			approvedList: [],
-			processInstanceId: '',
-			curIdx: 0
+			approvedList: []
 		}
 	},
 	filters: {
@@ -173,13 +170,9 @@ export default {
 		}
 	},
 	onLoad() {
-		uni.showLoading({
-			mask: true,
-			title: '加载中'
-		})
-		Promise.all([this.getList(), this.getApplyTypeList()]).then(() => {
-			uni.hideLoading()
-		})
+		this.getApplyTypeList()
+		this.getApplyList()
+		this.getApprovedRecord()
 	},
 	methods: {
 		renderStatusBgColor(index) {
@@ -193,51 +186,35 @@ export default {
 				return 'status-pending'
 			}
 		},
+		// 下拉刷新
 		async onPullDownRefresh() {
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
-			this.pageNum = 1
 			if (this.tabIndex === 0) {
+				this.applyPagination.pageNum = 1
 				this.applyType = ''
 				this.applyList = []
-				await this.getList()
+				await this.getApplyList()
 			} else {
-				await this.getApprovedList()
+				this.approvedPagination.pageNum = 1
+				this.approvedList = []
+				await this.getApprovedRecord()
 			}
-			uni.hideLoading()
 			uni.stopPullDownRefresh()
 		},
+		// 上拉加载
 		async onReachBottom() {
-			if (this.tabIndex === 1) return
 			if (this.isLoadMore) return
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
 
-			this.pageNum += 1
-			await this.getList()
-			uni.hideLoading()
+			if (this.tabIndex === 0) {
+				this.applyPagination.pageNum += 1
+				await this.getApplyList()
+			} else {
+				this.approvedPagination.pageNum += 1
+				await this.getApprovedRecord()
+			}
 		},
 		async changeTab(index) {
 			if (this.tabIndex === index) return
 			this.tabIndex = index
-
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
-			this.pageNum = 1
-			if (index === 0) {
-				this.applyType = ''
-				this.applyList = []
-				await this.getList()
-			} else {
-				await this.getApprovedList()
-			}
-			uni.hideLoading()
 		},
 		async getApplyTypeList() {
 			const { code, data } = await getApplyType()
@@ -253,15 +230,16 @@ export default {
 		changeApplyType(e) {
 			const { value } = e.detail.value[0]
 			this.applyType = value
-			this.getList()
+			this.applyList = []
+			this.getApplyList()
 		},
-		async getList() {
-			this.loadStatus = 'loading'
+		async getApplyList() {
 			this.isChecked = false
 			this.batchIds = []
+			this.loadStatus = 'loading'
 			const params = {
 				applyType: this.applyType,
-				pageNum: this.pageNum
+				pageNum: this.applyPagination.pageNum
 			}
 			const res = await searchTodo(params)
 			if (res.code === 200) {
@@ -278,24 +256,35 @@ export default {
 				}
 			}
 		},
-		async getApprovedList() {
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
-			const res = await getApprovedRecord()
+		async getApprovedRecord() {
+			const params = {
+				pageNum: this.approvedPagination.pageNum
+			}
+			const res = await doneList(params)
 			if (res.code === 200) {
-				uni.hideLoading()
-				this.approvedList = res.rows.map(item => {
+				const rows = res.rows.map(item => {
 					return item.jyApplyEnterRoom
 				})
+				this.approvedList = this.approvedList.concat(rows)
+				if (this.approvedList.length === res.total) {
+					this.isLoadMore = true
+					this.loadStatus = 'nomore'
+				} else {
+					this.isLoadMore = false
+					this.loadStatus = 'more'
+				}
 			}
 		},
 		batchClick() {
-			if (this.applyList.length === 0) return
+			if (this.applyList.length === 0) {
+				uni.showToast({
+					title: '没有可操作数据'
+				})
+				return
+			}
 			if (this.isChecked && this.batchIds.length > 0) {
 				// 提交批量审批，重新加载数据列表，清空已选中
-				// for(let key of approval) {
+				// for(let key of Approved) {
 				// 	key.checked = false
 				// }
 				// this.batchIds = []
@@ -309,35 +298,25 @@ export default {
 		viewDetail(item) {
 			const { processInstanceId, processStatus } = item
 			uni.navigateTo({ url: `./detail?id=${processInstanceId}&status=${processStatus}` })
-		},
-		revoke(processInstanceId, index) {
-			this.processInstanceId = processInstanceId
-			this.curIdx = index
-			this.$refs.popup.open()
-		},
-		async dialogConfirm(value) {
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
-			const res = await recallTask({ processInstanceId: this.processInstanceId })
-			if (res.code === 200) {
-				this.$refs.popup.close()
-				uni.showToast({
-					title: '撤销成功',
-					icon: 'success'
-				})
-				this.approvedList[this.curIdx].processStatus = 3
-			}
 		}
 	}
 }
 </script>
 
 <style lang="scss">
+$input-height: 80rpx;
 .select-row {
 	display: flex;
 	margin: 20rpx;
+	margin-bottom: 0;
+	.readonly-selct {
+		flex: 1;
+		height: $input-height;
+		border: 1px solid #b1daff;
+		border-radius: 12rpx;
+		box-sizing: border-box;
+		background: #fff;
+	}
 	/deep/ {
 		.input-value-border {
 			border: 1px solid #b1daff;
@@ -347,12 +326,12 @@ export default {
 			font-size: 24rpx !important;
 		}
 		.input-value {
-			height: 72rpx;
+			height: $input-height;
 		}
 	}
 	button {
 		margin-left: 30rpx;
-		line-height: 72rpx;
+		line-height: $input-height;
 		font-size: 24rpx;
 		border-radius: 12rpx;
 	}
@@ -368,14 +347,23 @@ export default {
 		}
 	}
 }
-.swipe-box {
+
+.slide-box {
 	display: flex;
 	align-items: center;
+	&_left {
+		flex: 1;
+	}
 	&_right {
+		transition: width 0.3s;
 		text-align: center;
 	}
-	.card {
-		margin-top: 0;
+}
+
+.slide-box,
+.approved-list {
+	.card:last-child {
+		margin-bottom: 0;
 	}
 }
 </style>

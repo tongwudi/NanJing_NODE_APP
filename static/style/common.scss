@@ -125,9 +125,7 @@
 }
 
 .no-data {
-	margin-top: 120rpx;
-	text-align: center;
-	color: #999;
+	margin-top: 30%;
 }
 
 .card-status {
@@ -167,9 +165,17 @@
 .status-resolve {
 	background-image: linear-gradient(to right, #dbf2ff, #dafdff);
 }
-//已驳回
+// 已驳回
 .status-reject {
 	background-image: linear-gradient(to right, #ffa5a5, #ffcea1);
+}
+// 通过
+.status-adopt {
+	color: #0AA17D;
+}
+// 不通过
+.status-fail {
+	color: #E31414;
 }
 
 .btn-row {

@@ -176,59 +176,58 @@
 		</view>
 
 		<view class="content" v-show="tabIndex === 1">
-			<template v-if="applyList.length > 0">
-				<m-card
-					v-for="(item, index) in applyList"
-					:key="index"
-					@tapClick="viewDetail(item.processInstanceId)"
-				>
-					<template v-slot:other>
-						<view
-							class="card-status"
-							:class="[renderStatus(item)]"
-						>
-							{{
-								'authCodeDto' in item
-									? item.authCodeDto.status
-									: renderStatusText(item.processStatus)
-							}}
-						</view>
-						<button
-							class="cancel-btn"
-							v-if="
-								('authCodeDto' in item &&
-									item.authCodeDto.status === '0') ||
-									item.processStatus === '0'
-							"
-							@click.stop="revoke(item.processInstanceId, index)"
-						>
-							撤销
-						</button>
-					</template>
-					<view class="card-content__body">
-						<view>
-							<text>进出类型</text>
-							<text>{{ item.applyTypeName }}</text>
-						</view>
-						<view>
-							<text>所属项目</text>
-							<text>{{ item.belongProject }}</text>
-						</view>
-						<view v-if="item.authCodeDto">
-							<text>验证码</text>
-							<text class="bold">
-								{{ item.authCodeDto.authCode }}
-							</text>
-						</view>
-						<view v-else>
-							<text>申请时间</text>
-							<text>{{ item.applyTime }}</text>
-						</view>
+			<m-card
+				v-for="(item, index) in applyList"
+				:key="index"
+				@tapClick="viewDetail(item)"
+			>
+				<template v-slot:other>
+					<view class="card-status" :class="[renderStatus(item)]">
+						{{
+							'authCodeDto' in item
+								? item.authCodeDto.status
+								: renderStatusText(item.processStatus)
+						}}
 					</view>
-				</m-card>
-				<uni-load-more :status="loadStatus"></uni-load-more>
-			</template>
-			<view v-else class="no-data">暂无数据</view>
+					<button
+						class="cancel-btn"
+						v-if="
+							('authCodeDto' in item &&
+								item.authCodeDto.status === '0') ||
+								item.processStatus === '0'
+						"
+						@click.stop="revoke(item.processInstanceId, index)"
+					>
+						撤销
+					</button>
+				</template>
+				<view class="card-content__body">
+					<view>
+						<text>进出类型</text>
+						<text>{{ item.applyTypeName }}</text>
+					</view>
+					<view>
+						<text>所属项目</text>
+						<text>{{ item.belongProject }}</text>
+					</view>
+					<view v-if="item.authCodeDto">
+						<text>验证码</text>
+						<text class="bold">{{ item.authCodeDto.authCode }}</text>
+					</view>
+					<view v-else>
+						<text>申请时间</text>
+						<text>{{ item.applyTime }}</text>
+					</view>
+				</view>
+			</m-card>
+			<uni-load-more
+				:status="loadStatus"
+				:class="{
+					'no-data':
+						loadStatus === 'loading' ||
+						(loadStatus === 'nomore' && !applyList.length)
+				}"
+			/>
 		</view>
 
 		<uni-popup ref="popup" type="dialog">
@@ -240,7 +239,7 @@
 				@confirm="dialogConfirm"
 			></uni-popup-dialog>
 		</uni-popup>
-		
+
 		<m-tabbar />
 	</view>
 </template>
@@ -291,17 +290,10 @@ export default {
 		}
 	},
 	onLoad() {
-		uni.showLoading({
-			mask: true,
-			title: '加载中'
-		})
-		Promise.all([
-			this.getCountyList(),
-			this.getLeaderList(),
-			this.getApplyTypeList()
-		]).then(() => {
-			uni.hideLoading()
-		})
+		this.getCountyList(),
+		this.getLeaderList(),
+		this.getApplyTypeList(),
+		this.getApplyRecord()
 	},
 	methods: {
 		renderStatusText(index) {
@@ -349,7 +341,7 @@ export default {
 				this.pageNum = 1
 				this.applyList = []
 				this.getApplyRecord()
-			} else {
+			} else { // 下拉重置表单
 				this.formData = {}
 				this.files = []
 				this.staffList = [{}]
@@ -366,12 +358,6 @@ export default {
 		changeTab(index) {
 			if (this.tabIndex === index) return
 			this.tabIndex = index
-
-			if (index === 1) {
-				this.pageNum = 1
-				this.applyList = []
-				this.getApplyRecord()
-			}
 		},
 		async getCountyList() {
 			const { code, data } = await getCounty()
@@ -385,18 +371,12 @@ export default {
 			}
 		},
 		async getRoomList(e) {
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
-
 			this.roomList = []
 			this.$delete(this.formData, 'roomId')
 
 			const { value: county } = e.detail.value[0]
 			const res = await getRoomByCounty({ county })
 			if (res.code === 200) {
-				uni.hideLoading()
 				this.roomList = res.data.map(item => {
 					return {
 						text: item.roomName,
@@ -425,26 +405,6 @@ export default {
 						value: item.applyTypeId
 					}
 				})
-			}
-		},
-		async getApplyRecord() {
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
-			this.loadStatus = 'loading'
-			const params = { pageNum: this.pageNum, pageSize: this.pageSize }
-			const res = await getApplyList(params)
-			if (res.code === 200) {
-				uni.hideLoading()
-				this.applyList = this.applyList.concat(res.rows)
-				if (this.applyList.length === res.total) {
-					this.isLoadMore = true
-					this.loadStatus = 'nomore'
-				} else {
-					this.isLoadMore = false
-					this.loadStatus = 'more'
-				}
 			}
 		},
 		// 选择文件
@@ -481,10 +441,6 @@ export default {
 			}
 		},
 		submitForm(ref) {
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
 			this.$refs[ref].validate().then(async data => {
 				const verifyStaff = this.staffList.some(item => !item.applyName || !item.applyContract || !item.applyIdCard)
 				if (verifyStaff) {
@@ -505,18 +461,38 @@ export default {
 				}
 				const res = await startApply(params)
 				if (res.code === 200) {
+					// 重置表单
 					this.formData = {}
 					this.files = []
 					this.staffList = [{}]
+					// 更新申请记录
+					await this.getApplyRecord()
 					uni.showToast({
-						title: '申请成功',
+						title: '发起成功',
 						icon: 'success'
 					})
+					
 				}
 			})
 		},
-		viewDetail(id) {
-			uni.navigateTo({ url: './detail?id=' + id })
+		async getApplyRecord() {
+			this.loadStatus = 'loading'
+			const params = { pageNum: this.pageNum, pageSize: this.pageSize }
+			const res = await getApplyList(params)
+			if (res.code === 200) {
+				this.applyList = this.applyList.concat(res.rows)
+				if (this.applyList.length === res.total) {
+					this.isLoadMore = true
+					this.loadStatus = 'nomore'
+				} else {
+					this.isLoadMore = false
+					this.loadStatus = 'more'
+				}
+			}
+		},
+		viewDetail(item) {
+			const { processInstanceId, processStatus } = item
+			uni.navigateTo({ url: `./detail?id=${processInstanceId}&status=${processStatus}` })
 		},
 		revoke(processInstanceId, index) {
 			this.processInstanceId = processInstanceId
@@ -524,10 +500,6 @@ export default {
 			this.$refs.popup.open()
 		},
 		async dialogConfirm() {
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
 			const res = await recallTask({ processInstanceId: this.processInstanceId })
 			if (res.code === 200) {
 				this.$refs.popup.close()

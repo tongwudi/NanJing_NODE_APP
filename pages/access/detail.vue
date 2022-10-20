@@ -56,7 +56,7 @@
 					<view v-if="files.length > 0">
 						<text>附件</text>
 						<view class="annex-list">
-							<text v-for="item in files">
+							<text v-for="(item, index) in files" :key="index">
 								{{ item.fileName }}
 							</text>
 						</view>
@@ -108,8 +108,8 @@
 								<text>{{ item.nodeName }}</text>
 								<text>{{ item.assigneeName }}</text>
 							</view>
-							<view class="applicant-status" v-if="item.approveTime">
-								<text>{{ item.approveOperate }}</text>
+							<view class="applicant-status" v-if="item.approveOperate">
+								<text :class="[renderApproveTextColor(item.approveOperate)]">{{ item.approveOperate }}</text>
 								<uni-dateformat :date="item.approveTime"></uni-dateformat>
 							</view>
 							<text v-else class="unapproved">未开始</text>
@@ -147,7 +147,7 @@
 			<!-- 访客离开 -->
 			<view
 				class="btn-row"
-				v-if="roles.includes('admin') && processStatus === '访客离开'"
+				v-if="roles.includes('common') && processStatus === '访客离开'"
 			>
 				<button type="primary" @click="clockOut">离开打卡</button>
 			</view>
@@ -155,9 +155,8 @@
 			<view
 				class="btn-row"
 				v-else-if="
-					(processStatus === '项目经理审批' ||
-						processStatus === '网络员审批') &&
-						!roles.includes('admin')
+					(processStatus === '项目经理审批' && roles.includes('manager')) ||
+					(processStatus === '网络员审批' && roles.includes('network'))
 				"
 			>
 				<button type="warn" @click="rejectClick">驳回</button>
@@ -167,9 +166,8 @@
 			<view
 				class="btn-row"
 				v-else-if="
-					(processStatus === '代维已办' ||
-						processStatus === '代维已确认') &&
-						!roles.includes('admin')
+					(processStatus === '代维已办' || processStatus === '代维已确认') &&
+					roles.includes('maintaining')
 				"
 			>
 				<button type="primary" @click="passClick">确认</button>
@@ -217,18 +215,20 @@ export default {
 	computed: {
 		...mapState(['roles'])
 	},
-	async onLoad(params) {
+	onLoad(params) {
 		this.processInstanceId = params.id
 		this.processStatus = params.status
 
-		uni.showLoading({
-			mask: true,
-			title: '加载中'
-		})
-		await this.getDetail()
-		uni.hideLoading()
+		this.getDetail()
 	},
 	methods: {
+		renderApproveTextColor(text) {
+			if (text === '通过') {
+				return 'status-adopt'
+			} else {
+				return 'status-fail'
+			}
+		},
 		renderCodeStatusBgColor(index) {
 			if (index == 1) {
 				return 'status-yjh'
@@ -273,10 +273,6 @@ export default {
 			this.$refs.popup.open()
 		},
 		async dialogConfirm() {
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
 			const params = {
 				taskId: this.taskId,
 				status: 'yes' // 审批状态(yes-通过 no-驳回)
@@ -299,10 +295,6 @@ export default {
 				uni.showToast({ title: '驳回原因不能为空' })
 				return
 			}
-			uni.showLoading({
-				mask: true,
-				title: '加载中'
-			})
 			const params = {
 				comment: value,
 				taskId: this.taskId,

@@ -76,6 +76,7 @@ export default {
 				phonenumber: '',
 				password: '',
 				// phonenumber: '15888888888', // 若依-申请人
+				// phonenumber: '15065014525', // 若依-申请人
 				// phonenumber: '18168935982', // 项目经理1
 				// phonenumber: '17766365691', // 阚庆武-网格员
 				// password: 'admin123',
@@ -116,17 +117,13 @@ export default {
 		},
 		submitLogin(ref) {
 			this.$refs[ref].validate().then(async data => {
-				uni.showLoading({
-					mask: true,
-					title: '加载中'
-				})
 				const params = {
 					...this.formData,
 					password: encrypt(this.formData.password)
 				}
 				const res = await appLogin(params)
+				console.log(res);
 				if (res.code === 200) {
-					uni.hideLoading()
 					if (this.isRememberPwd) {
 						const { phonenumber, password } = this.formData
 						uni.setStorageSync('phonenumber', phonenumber)
