@@ -122,7 +122,6 @@ export default {
 					password: encrypt(this.formData.password)
 				}
 				const res = await appLogin(params)
-				console.log(res);
 				if (res.code === 200) {
 					if (this.isRememberPwd) {
 						const { phonenumber, password } = this.formData

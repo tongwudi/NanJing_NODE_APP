@@ -43,8 +43,10 @@ export default {
 			 * @maintaining 代维
 			 **/
 			const pagePath =
-				!this.roles.includes('admin') &&
-				this.roles.includes('manager' || 'network' || 'maintaining')
+				(!this.roles.includes('admin') &&
+					this.roles.includes('manager')) ||
+				this.roles.includes('network') ||
+				this.roles.includes('maintaining')
 					? 'pages/access/approval'
 					: 'pages/access/apply'
 
