@@ -47,7 +47,7 @@
 					:key="index"
 				>
 					<view class="slide-box_left">
-						<m-card @tapClick="viewDetail(item)">
+						<m-card @tapClick="viewDetail(item.processInstanceId, 1)">
 							<view class="card-content__body">
 								<view class="applicant">
 									<image :src="item.applyUserAvatar" v-if="item.applyUserAvatar"></image>
@@ -68,7 +68,7 @@
 							</view>
 						</m-card>
 					</view>
-					<view class="slide-box_right" :style="{ width: isChecked ? '15%': 0 }">
+					<view class="slide-box_right" :style="{ width: isChecked ? '15%' : 0 }">
 						<checkbox :value="index + ''" />
 					</view>
 				</view>
@@ -88,7 +88,7 @@
 				<m-card
 					v-for="(item, index) in approvedList"
 					:key="index"
-					@tapClick="viewDetail(item)"
+					@tapClick="viewDetail(item.processInstanceId, 2)"
 				>
 					<template v-slot:other>
 						<view
@@ -295,9 +295,8 @@ export default {
 			const values = e.detail.value
 			this.batchIds = values
 		},
-		viewDetail(item) {
-			const { processInstanceId, processStatus } = item
-			uni.navigateTo({ url: `./detail?id=${processInstanceId}&status=${processStatus}` })
+		viewDetail(id, type) {
+			uni.navigateTo({ url: `./detail?id=${id}&type=${type}` })
 		}
 	}
 }

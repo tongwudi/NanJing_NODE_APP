@@ -176,50 +176,52 @@
 		</view>
 
 		<view class="content" v-show="tabIndex === 1">
-			<m-card
-				v-for="(item, index) in applyList"
-				:key="index"
-				@tapClick="viewDetail(item)"
-			>
-				<template v-slot:other>
-					<view class="card-status" :class="[renderStatus(item)]">
-						{{
-							'authCodeDto' in item
-								? item.authCodeDto.status
-								: renderStatusText(item.processStatus)
-						}}
+			<view class="apply-list">
+				<m-card
+					v-for="(item, index) in applyList"
+					:key="index"
+					@tapClick="viewDetail(item.processInstanceId)"
+				>
+					<template v-slot:other>
+						<view class="card-status" :class="[renderStatus(item)]">
+							{{
+								item.authCodeDto
+									? item.authCodeDto.status
+									: renderStatusText(item.processStatus)
+							}}
+						</view>
+						<button
+							class="cancel-btn"
+							v-if="
+								item.authCodeDto
+									? item.authCodeDto.status == '0'
+									: item.processStatus == '0'
+							"
+							@click.stop="revoke(item.processInstanceId, index)"
+						>
+							撤销
+						</button>
+					</template>
+					<view class="card-content__body">
+						<view>
+							<text>进出类型</text>
+							<text>{{ item.applyTypeName }}</text>
+						</view>
+						<view>
+							<text>所属项目</text>
+							<text>{{ item.belongProject }}</text>
+						</view>
+						<view v-if="item.authCodeDto">
+							<text>验证码</text>
+							<text class="bold">{{ item.authCodeDto.authCode }}</text>
+						</view>
+						<view v-else>
+							<text>申请时间</text>
+							<text>{{ item.applyTime }}</text>
+						</view>
 					</view>
-					<button
-						class="cancel-btn"
-						v-if="
-							('authCodeDto' in item &&
-								item.authCodeDto.status === '0') ||
-								item.processStatus === '0'
-						"
-						@click.stop="revoke(item.processInstanceId, index)"
-					>
-						撤销
-					</button>
-				</template>
-				<view class="card-content__body">
-					<view>
-						<text>进出类型</text>
-						<text>{{ item.applyTypeName }}</text>
-					</view>
-					<view>
-						<text>所属项目</text>
-						<text>{{ item.belongProject }}</text>
-					</view>
-					<view v-if="item.authCodeDto">
-						<text>验证码</text>
-						<text class="bold">{{ item.authCodeDto.authCode }}</text>
-					</view>
-					<view v-else>
-						<text>申请时间</text>
-						<text>{{ item.applyTime }}</text>
-					</view>
-				</view>
-			</m-card>
+				</m-card>
+			</view>
 			<uni-load-more
 				:status="loadStatus"
 				:class="{
@@ -290,9 +292,9 @@ export default {
 		}
 	},
 	onLoad() {
-		this.getCountyList(),
-		this.getLeaderList(),
-		this.getApplyTypeList(),
+		this.getCountyList()
+		this.getLeaderList()
+		this.getApplyTypeList()
 		this.getApplyRecord()
 	},
 	methods: {
@@ -327,10 +329,10 @@ export default {
 				return 'status-djh'
 			}
 		},
-		renderStatus (item) {
+		renderStatus(item) {
 			if (item.processStatus == 3) {
 				return this.renderStatusBgColor(item.processStatus)
-			} else if ('authCodeDto' in item) {
+			} else if (item.authCodeDto) {
 				return this.renderCodeStatusBgColor(item.authCodeDto.value)
 			} else {
 				return this.renderStatusBgColor(item.processStatus)
@@ -465,8 +467,6 @@ export default {
 					this.formData = {}
 					this.files = []
 					this.staffList = [{}]
-					// 更新申请记录
-					await this.getApplyRecord()
 					uni.showToast({
 						title: '发起成功',
 						icon: 'success'
@@ -490,9 +490,8 @@ export default {
 				}
 			}
 		},
-		viewDetail(item) {
-			const { processInstanceId, processStatus } = item
-			uni.navigateTo({ url: `./detail?id=${processInstanceId}&status=${processStatus}` })
+		viewDetail(id) {
+			uni.navigateTo({ url: `./detail?id=${id}&type=2` })
 		},
 		revoke(processInstanceId, index) {
 			this.processInstanceId = processInstanceId
@@ -550,5 +549,9 @@ export default {
 	font-size: 28rpx;
 	color: #2391ff;
 	background-color: #fff;
+}
+
+.apply-list .card:last-child {
+	margin-bottom: 0;
 }
 </style>

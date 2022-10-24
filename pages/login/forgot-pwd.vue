@@ -88,8 +88,12 @@ export default {
 				confirmPassword
 			},
 			hasSent: false,
+			timer: null,
 			timeupSecond: 0
 		}
+	},
+	beforeDestroy() {
+		this.timer && clearInterval(this.timer)
 	},
 	methods: {
 		sendCode(ref) {
@@ -100,11 +104,11 @@ export default {
 					this.formData.uuid = res.msg
 					this.hasSent = true
 					this.timeupSecond = 60
-					const timer = setInterval(() => {
+					this.timer = setInterval(() => {
 						this.timeupSecond--
 						if (this.timeupSecond < 1) {
 							this.hasSent = false
-							clearInterval(timer)
+							clearInterval(this.timer)
 						}
 					}, 1000)
 				}

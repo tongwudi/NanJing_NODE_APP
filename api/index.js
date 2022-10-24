@@ -1,7 +1,7 @@
 import http from '@/utils/request.js'
 
 // 获取验证码
-export const captchaImage = () => http.get('/captchaImage')
+export const captchaImage = data => http.get('/captchaImage', data, false)
 // 登录
 export const appLogin = data => http.post('/appLogin', data)
 // 注册
@@ -20,7 +20,7 @@ export const getApplyList = data => http.get('/enter/room/applyList', data, fals
 export const searchTodo = data => http.get('/enter/room/searchTodo', data, false)
 // 详情
 export const viewTask = data => http.get('/enter/room/viewTask', data)
-// 驳回/撤销 详情
+// 待审批 详情
 export const viewTaskEnd = data => http.get('/enter/room/viewTaskEnd', data)
 // 扫码详情
 export const getRoomInfo = data => http.get('/enter/room/roomInfo', data)

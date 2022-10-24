@@ -202,6 +202,7 @@ export default {
 	data() {
 		return {
 			processInstanceId: '',
+			processType: '',
 			processStatus: '',
 			popupText: '',
 			info: {},
@@ -217,7 +218,7 @@ export default {
 	},
 	onLoad(params) {
 		this.processInstanceId = params.id
-		this.processStatus = params.status
+		this.processType = params.type
 
 		this.getDetail()
 	},
@@ -241,26 +242,25 @@ export default {
 		async getDetail() {
 			const params = { processInstanceId: this.processInstanceId }
 			let res;
-			if (this.processStatus == 2 || this.processStatus == 3) {
-				res = await viewTaskEnd(params)
-			} else {
+			if (this.processType == 1) {
 				res = await viewTask(params)
+			} else {
+				res = await viewTaskEnd(params)
 			}
 			const { data, code } = res
 			if (code === 200) {
 				this.info = data.applyEnterRoomEntity
 				this.files = data.jyApplyFiles
 				this.staffList = data.jyApplyPeople
+				this.authCode = data.authCode || {}
 
-				if (this.processStatus == 2 || this.processStatus == 3) {
-					this.processList = data.approveHistoryList
-				} else {
-					this.authCode = data.authCode || {}
-
+				if (this.processType == 1) {
 					const { userList, taskId, approveProcess} = data.task
 					this.processList = userList
 					this.taskId = taskId
 					this.processStatus = approveProcess
+				} else {
+					this.processList = data.approveHistoryList
 				}
 			}
 		},

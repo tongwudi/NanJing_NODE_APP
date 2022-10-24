@@ -31,8 +31,9 @@
 			>
 				<view class="card-content__body">
 					<view class="applicant">
-						<image src="/static/logo.png"></image>
-						<view>
+						<image :src="visitInfo.userAvatar" v-if="visitInfo.userAvatar"></image>
+						<image src="@/static/img/avatar.png" v-else></image>
+						<view class="applicant-name">
 							<text>申请人</text>
 							<text>{{ visitInfo.userName }}</text>
 						</view>
@@ -43,22 +44,6 @@
 					</view>
 				</view>
 			</m-card>
-
-			<!-- <m-card title="离开详情" :padding="25">
-				<view class="card-content__body">
-					<view class="applicant">
-						<image src="/static/logo.png"></image>
-						<view>
-							<text>申请人</text>
-							<text>张三</text>
-						</view>
-					</view>
-					<view>
-						<text>离开时间</text>
-						<text>2022/07/20 15:20</text>
-					</view>
-				</view>
-			</m-card> -->
 
 			<view class="staff-list" v-if="staffList.length > 0">
 				<m-card
@@ -115,11 +100,11 @@ import { getRoomInfo, verifyCode, getVisitInfo, completeTask } from '@/api/index
 export default {
 	data() {
 		return {
-			roomInfo: {},
+			taskId: '',
 			code: '',
+			roomInfo: {},
 			visitInfo: {},
 			staffList: [],
-			taskId: '',
 			isClock: false
 		}
 	},
@@ -135,6 +120,13 @@ export default {
 			}
 		},
 		async submitValid() {
+			if (this.code == '') {
+				uni.showToast({
+					title: '验证码不能为空',
+					icon: 'none'
+				})
+				return
+			}
 			const params = {
 				roomId: this.roomId,
 				code: this.code
@@ -147,6 +139,7 @@ export default {
 				})
 				const { code, data } = await getVisitInfo({ processInstanceId: res.msg })
 				if (code === 200) {
+					console.log(data);
 					this.visitInfo = data.visitInfo
 					this.staffList = data.peopleList
 					this.taskId = data.taskId

@@ -75,7 +75,7 @@ export default {
 			formData: {
 				phonenumber: '',
 				password: '',
-				// phonenumber: '15888888888', // 若依-申请人
+				// phonenumber: '15888888888', // 管理员
 				// phonenumber: '15065014525', // 若依-申请人
 				// phonenumber: '18168935982', // 项目经理1
 				// phonenumber: '17766365691', // 阚庆武-网格员

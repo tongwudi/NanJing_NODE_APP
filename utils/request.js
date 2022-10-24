@@ -252,11 +252,15 @@ global.$request.interceptors.response(res => {
 				title: '请重新登录',
 				icon: 'error'
 			})
+			// 避免因token过期导致其停留在空白页面
+			store.dispatch('Logout')
 		} else {
 			uni.showToast({
 				title: msg,
 				icon: 'error'
 			})
+			// 若要报错时同步请求接口并完整展示错误信息，接口最好搭配 showLoading 参数一起使用
+			// 目前只在登录时验证码错误用到
 			return res.data
 		}
 	} else {
