@@ -159,8 +159,8 @@
 					(processStatus === '网络员审批' && roles.includes('network'))
 				"
 			>
-				<button type="warn" @click="rejectClick">驳回</button>
-				<button type="primary" @click="passClick">通过</button>
+				<button type="warn" @click="refuseClick">驳回</button>
+				<button type="primary" @click="adoptClick">通过</button>
 			</view>
 			<!-- 代维已办/代维已确认 -->
 			<view
@@ -170,7 +170,7 @@
 					roles.includes('maintaining')
 				"
 			>
-				<button type="primary" @click="passClick">确认</button>
+				<button type="primary" @click="adoptClick">确认</button>
 			</view>
 		</view>
 
@@ -264,7 +264,7 @@ export default {
 				}
 			}
 		},
-		passClick() {
+		adoptClick() {
 			this.popupText = '确认通过审批？'
 			this.$refs.popup.open()
 		},
@@ -287,7 +287,7 @@ export default {
 				this.getDetail()
 			}
 		},
-		rejectClick() {
+		refuseClick() {
 			this.$refs.inputDialog.open()
 		},
 		async dialogInputConfirm(value) {
