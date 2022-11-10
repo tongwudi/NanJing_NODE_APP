@@ -10,7 +10,7 @@ const store = new Vuex.Store({
 		token: uni.getStorageSync('token'),
 		roles: uni.getStorageSync('roles') || [],
 		userInfo: uni.getStorageSync('userInfo') || {},
-		tabbarIdx: uni.getStorageSync('tabbarIdx') || 2
+		tabbarIdx: uni.getStorageSync('tabbarIdx')
 	},
 	mutations: {
 		SET_TOKEN(state, token) {
@@ -42,7 +42,7 @@ const store = new Vuex.Store({
 			uni.removeStorageSync('userInfo')
 		},
 		CLEAR_TABBARIDX(state) {
-			state.tabbarIdx = 0
+			state.tabbarIdx = 2
 			uni.removeStorageSync('tabbarIdx')
 		},
 	},
