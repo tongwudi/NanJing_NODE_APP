@@ -98,7 +98,7 @@
 				<view class="card-content__body">
 					<view
 						class="timeline-item"
-						v-for="(item, index) in processList"
+						v-for="(item, index) in processList.filter(v => !(v.approveOperate && !v.approveTime))"
 						:key="index"
 					>
 						<view class="applicant">
@@ -147,7 +147,7 @@
 			<!-- 访客离开 -->
 			<view
 				class="btn-row"
-				v-if="roles.includes('common') && processStatus === '访客离开'"
+				v-if="isPunch && approveProcess === '访客离开'"
 			>
 				<button type="primary" @click="clockOut">离开打卡</button>
 			</view>
@@ -155,8 +155,8 @@
 			<view
 				class="btn-row"
 				v-else-if="
-					(processStatus === '项目经理审批' && roles.includes('manager')) ||
-					(processStatus === '网络员审批' && roles.includes('network'))
+					(approveProcess === '项目经理审批' && roles.includes('manager')) ||
+					(approveProcess === '网络员审批' && roles.includes('network'))
 				"
 			>
 				<button type="warn" @click="refuseClick">驳回</button>
@@ -166,7 +166,7 @@
 			<view
 				class="btn-row"
 				v-else-if="
-					(processStatus === '代维已办' || processStatus === '代维已确认') &&
+					(approveProcess === '代维已办' || approveProcess === '代维已确认') &&
 					roles.includes('maintaining')
 				"
 			>
@@ -203,7 +203,7 @@ export default {
 		return {
 			processInstanceId: '',
 			processType: '',
-			processStatus: '',
+			approveProcess: '',
 			popupText: '',
 			info: {},
 			files: [],
@@ -214,7 +214,15 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['roles'])
+		...mapState(['roles']),
+		isPunch() {
+			return !(
+				!this.roles.includes('admin') &&
+				(this.roles.includes('manager') ||
+					this.roles.includes('network') ||
+					this.roles.includes('maintaining'))
+			)
+		}
 	},
 	onLoad(params) {
 		this.processInstanceId = params.id
@@ -255,12 +263,17 @@ export default {
 				this.authCode = data.authCode || {}
 
 				if (this.processType == 1) {
-					const { userList, taskId, approveProcess} = data.task
+					const { userList, taskId, approveProcess } = data.task
 					this.processList = userList
 					this.taskId = taskId
-					this.processStatus = approveProcess
+					this.approveProcess = approveProcess // 当前状态
 				} else {
 					this.processList = data.approveHistoryList
+					const approveHistoryList = Array.from(data.approveHistoryList)
+					const lastProcess = approveHistoryList.pop()
+					if (lastProcess.nodeName === '访客离开') {
+						this.approveProcess = '访客离开' // 当前状态
+					}
 				}
 			}
 		},

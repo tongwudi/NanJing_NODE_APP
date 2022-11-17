@@ -76,9 +76,10 @@ export default {
 				phonenumber: '',
 				password: '',
 				// phonenumber: '15888888888', // 管理员
-				// phonenumber: '15065014525', // 若依-申请人
-				// phonenumber: '18168935982', // 项目经理1
-				// phonenumber: '17766365691', // 阚庆武-网格员
+				// phonenumber: '17611111111', // 经理/申请人
+				// phonenumber: '17711111111', // 项目经理1
+				// phonenumber: '17811111111', // 网格员1
+				// phonenumber: '17911111111', // 代维
 				// password: 'admin123',
 				code: '',
 				uuid: ''

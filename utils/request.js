@@ -200,7 +200,8 @@ if (!global.$request) {
 
 // app不支持 api 代理，要写完整地址
 global.$request.setConfig({
-	baseUrl: 'http://ceexdx.natappfree.cc'
+	// baseUrl: 'http://ceexdx.natappfree.cc',
+	baseUrl: 'http://58.213.110.131:8215'
 })
 
 // 避免出现 "请注意 showLoading 与 hideLoading 必须配对使用" 警告

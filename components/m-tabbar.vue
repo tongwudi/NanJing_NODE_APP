@@ -41,6 +41,7 @@ export default {
 			 * @manager 项目经理
 			 * @network 网格员
 			 * @maintaining 代维
+			 * @director 经理
 			 **/
 			const pagePath =
 				!this.roles.includes('admin') &&
