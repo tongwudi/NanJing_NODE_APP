@@ -187,7 +187,9 @@
 							{{
 								item.processStatus != 0
 									? renderStatusText(item.processStatus)
-									: item.authCodeDto.status
+									: item.authCodeDto
+									? item.authCodeDto.status
+									: renderStatusText(item.processStatus)
 							}}
 						</view>
 						<button
