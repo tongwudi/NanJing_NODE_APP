@@ -185,9 +185,9 @@
 					<template v-slot:other>
 						<view class="card-status" :class="[renderStatus(item)]">
 							{{
-								item.authCodeDto
-									? item.authCodeDto.status
-									: renderStatusText(item.processStatus)
+								item.processStatus != 0
+									? renderStatusText(item.processStatus)
+									: item.authCodeDto.status
 							}}
 						</view>
 						<button
@@ -330,7 +330,7 @@ export default {
 			}
 		},
 		renderStatus(item) {
-			if (item.processStatus == 3) {
+			if (item.processStatus != 0) {
 				return this.renderStatusBgColor(item.processStatus)
 			} else if (item.authCodeDto) {
 				return this.renderCodeStatusBgColor(item.authCodeDto.value)
