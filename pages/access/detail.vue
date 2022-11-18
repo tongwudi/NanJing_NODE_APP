@@ -261,20 +261,11 @@ export default {
 				this.files = data.jyApplyFiles
 				this.staffList = data.jyApplyPeople
 				this.authCode = data.authCode || {}
-
-				if (this.processType == 1) {
-					const { userList, taskId, approveProcess } = data.task
-					this.processList = userList
-					this.taskId = taskId
-					this.approveProcess = approveProcess // 当前状态
-				} else {
-					this.processList = data.approveHistoryList
-					const approveHistoryList = Array.from(data.approveHistoryList)
-					const lastProcess = approveHistoryList.pop()
-					if (lastProcess.nodeName === '访客离开') {
-						this.approveProcess = '访客离开' // 当前状态
-					}
-				}
+				this.processList = data.approveHistoryList
+				
+				const { taskId, approveProcess } = data?.task
+				this.taskId = taskId
+				this.approveProcess = approveProcess // 当前状态
 			}
 		},
 		adoptClick() {
@@ -393,13 +384,21 @@ export default {
 }
 
 .annex-list {
+	flex: 1;
+	width: 0;
 	display: flex;
 	flex-direction: column;
 	line-height: 40rpx;
 	color: #2391ff;
 
-	text:not(:first-child) {
-		margin-top: 18rpx;
+	text {
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+
+		&:not(:first-child) {
+			margin-top: 18rpx;
+		}
 	}
 }
 </style>
