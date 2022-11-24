@@ -4,7 +4,7 @@
 
 		<image class="bg-top" src="@/static/img/bg-top.png"></image>
 
-		<m-nav left-icon="left" right-icon="scan" title="进出机房申请"></m-nav>
+		<m-nav left-icon="back" right-icon="scan" title="进出机房申请"></m-nav>
 
 		<view class="content">
 			<m-card :padding="25">
@@ -263,7 +263,7 @@ export default {
 				this.authCode = data.authCode || {}
 				this.processList = data.approveHistoryList
 				
-				const { taskId, approveProcess } = data?.task
+				const { taskId, approveProcess } = data?.task || {}
 				this.taskId = taskId
 				this.approveProcess = approveProcess // 当前状态
 			}

@@ -44,3 +44,7 @@ export const getLeader = () => http.get('/enter/room/getLeader')
 export const getApplyType = () => http.get('/apply/type/list')
 // 文件上传
 export const uploadFiles = data => http.upload('/enter/room/uploadFiles', data)
+// 获取机房的经纬度信息
+export const getRoomMap = data => http.get('/room/info/map', data)
+// 获取各类节点的数量
+export const getTypeCount = data => http.get('/room/info/typeCount', data)

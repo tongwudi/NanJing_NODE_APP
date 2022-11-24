@@ -5,7 +5,7 @@
 		<image class="bg-top" src="@/static/img/bg-top.png"></image>
 
 		<view class="nav">
-			<m-nav left-icon="left"></m-nav>
+			<m-nav left-icon="back"></m-nav>
 
 			<view class="page-title">注册</view>
 		</view>

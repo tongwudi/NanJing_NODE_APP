@@ -4,7 +4,7 @@
 
 		<image class="bg-top" src="@/static/img/bg-top.png"></image>
 
-		<m-nav left-icon="left" title="进出机房申请"></m-nav>
+		<m-nav left-icon="back" title="进出机房申请"></m-nav>
 
 		<view class="content">
 			<m-card title="机房信息" :padding="25">
