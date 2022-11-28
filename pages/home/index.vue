@@ -104,6 +104,7 @@ export default {
 	watch: {
 		showMap: {
 			handler(val) {
+				// 显示charts时设置被点击分区域填充色
 				if (!val) {
 					const colorArr = Array.from(this.colorArr)
 					this.currentIdx !== -1 && (colorArr[this.currentIdx] = '#FACC14')
@@ -123,6 +124,7 @@ export default {
 			const { series } = this.chartData
 			const name = series[this.currentIdx]?.properties.name || ''
 
+			// 若未点击分区域，则重置分区域颜色为初始值
 			if (this.currentIdx === -1) {
 				const colorArr = Array.from(this.colorArr)
 				this.opts.color = colorArr

@@ -34,6 +34,15 @@
 				showExtraIcon
 				showArrow
 				clickable
+				title="隐私政策"
+				to="./privacy-policy"
+				:border="false"
+				:extraIcon="lockedIcon"
+			/>
+			<uni-list-item
+				showExtraIcon
+				showArrow
+				clickable
 				title="退出登录"
 				:border="false"
 				@click="logout"
