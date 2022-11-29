@@ -272,7 +272,7 @@ export default {
 				applyCompany: verify('申请单位', 'input'),
 				proManagerId: verify('项目经理', 'select'),
 				applyTime: verify('申请时间', 'input'),
-				workTime: verify('实施时间', 'input'),
+				workTime: verify('实施时间', 'datetime'),
 				belongProject: verify('所属项目', 'input'),
 				belongMajor: verify('所属专业', 'input'),
 				workCompany: verify('施工单位', 'input'),

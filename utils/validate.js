@@ -13,6 +13,22 @@ const verify = (label, type) => {
 				errorMessage: label + '不能为空'
 			}]
 		}
+	} else if (type === 'datetime') {
+		return {
+			rules: [{
+					required: true,
+					errorMessage: label + '不能为空'
+				},
+				{
+					validateFunction: (rule, value, data, callback) => {
+						if (value.length < 12) {
+							callback(label + '未选择具体时间')
+						}
+						return true
+					}
+				}
+			]
+		}
 	} else {
 		return {
 			required: true,
@@ -55,7 +71,8 @@ module.exports = {
 			verify('密码'),
 			{
 				validateFunction: (rule, value, data, callback) => {
-					const reg = /(?!.*\s)(?!^[\u4e00-\u9fa5]+$)(?!^[0-9]+$)(?!^[A-z]+$)(?!^[^A-z0-9]+$)^.{8,20}$/
+					const reg =
+						/(?!.*\s)(?!^[\u4e00-\u9fa5]+$)(?!^[0-9]+$)(?!^[A-z]+$)(?!^[^A-z0-9]+$)^.{8,20}$/
 					if (!reg.test(value)) {
 						callback('数字、字母和特殊字符(除空格外)至少包含两种')
 					} else if (value.length < 8) {
